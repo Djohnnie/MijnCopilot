@@ -1,0 +1,50 @@
+﻿@using MediatR
+@using MijnCopilot.Application.Chats.Queries
+@using MijnCopilot.Web.Helpers
+
+@implements IDisposable
+
+@inject NavigationHelper NavigationHelper
+@inject IMediator Mediator
+
+<MudNavMenu>
+    <MudNavLink Class="mt-2" Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Start hier</MudNavLink>
+
+    @if (NavigationHelper.Links.Any())
+    {
+        <MudDivider Class="my-2" />
+
+        @foreach (var link in NavigationHelper.Links)
+        {
+            <MudNavLink Href="@link.Url" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Chat">@link.Title</MudNavLink>
+        }
+    }
+</MudNavMenu>
+
+@code
+{
+
+    private List<ChatDto> _activeChats = new List<ChatDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationHelper.LinksChanged += OnLinksChanged;
+
+        var response = await Mediator.Send(new GetActiveChatsQuery());
+
+        response.Chats.ForEach(chat =>
+        {
+            NavigationHelper.AddLink(chat.Title, $"/chat/{chat.Id}");
+        });
+    }
+
+    private void OnLinksChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        NavigationHelper.LinksChanged -= OnLinksChanged;
+    }
+}

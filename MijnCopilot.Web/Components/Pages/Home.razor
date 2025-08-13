@@ -1,0 +1,100 @@
+﻿@using MediatR
+@using MijnCopilot.Application.Agents.Commands
+@using MijnCopilot.Application.Chats.Commands
+@using MijnCopilot.Web.Helpers
+
+@page "/"
+
+@inject NavigationHelper NavigationHelper
+@inject NavigationManager NavigationManager
+@inject IMediator Mediator
+
+<PageTitle>MijnCopilot - Thuispagina</PageTitle>
+
+<MudContainer Class="pa-0 pa-sm-12">
+    <MudChat ChatPosition="ChatBubblePosition.Start">
+        <MudAvatar Color="Color.Default">
+            <MudIcon Icon="@Icons.Material.Filled.Webhook" Color="Color.Default" />
+        </MudAvatar>
+        <MudChatHeader Name="MijnCopilot" />
+        <MudChatBubble Color="Color.Default">
+            Waarmee kan ik je helpen?
+        </MudChatBubble>
+    </MudChat>
+
+    @if (!string.IsNullOrEmpty(_request))
+    {
+        <MudChat ChatPosition="ChatBubblePosition.End">
+            <MudAvatar Color="Color.Primary">
+                <MudIcon Icon="@Icons.Material.Filled.Face" Color="Color.Default" />
+            </MudAvatar>
+            <MudChatHeader Name="Jij" Time="nu juist" />
+            <MudChatBubble Color="Color.Default">
+                @_request
+            </MudChatBubble>
+        </MudChat>
+    }
+
+    @if (_isLoading)
+    {
+        <MudChat ChatPosition="ChatBubblePosition.Start">
+            <MudAvatar Color="Color.Default">
+                <MudProgressCircular Size="Size.Small" Color="Color.Default" Indeterminate="true" />
+            </MudAvatar>
+
+            <MudChatBubble Color="Color.Default">
+                ...
+            </MudChatBubble>
+        </MudChat>
+    }
+</MudContainer>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex flex-column justify-center gap-4">
+    <MudTextField T="string" Label="Stel je vraag" Variant="Variant.Outlined" @bind-Value="Request" Immediate="true" OnKeyDown="@OnKeyDown" TextUpdateSuppression="false"
+                  Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="@Icons.Material.Filled.Send" OnAdornmentClick="@AskQuestion" />
+</MudContainer>
+
+@code
+{
+    private bool _isLoading;
+    private string _request = string.Empty;
+
+    public string Request { get; set; }
+
+    protected async Task AskQuestion()
+    {
+        if (string.IsNullOrWhiteSpace(Request))
+        {
+            return;
+        }
+
+        _isLoading = true;
+        _request = Request;
+        Request = string.Empty;
+
+        StateHasChanged();
+
+        var keyword = await Mediator.Send(new GenerateKeywordFromRequestCommand
+        {
+            Request = _request
+        });
+
+        var response = await Mediator.Send(new CreateNewChatCommand
+        {
+            Title = keyword.Keyword,
+            Request = _request,
+            TokensUsed = 100
+        });
+
+        NavigationHelper.AddLink(keyword.Keyword, $"/chat/{response.ChatId}", insert: true);
+        NavigationManager.NavigateTo($"/chat/{response.ChatId}");
+    }
+
+    protected async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await AskQuestion();
+        }
+    }
+}

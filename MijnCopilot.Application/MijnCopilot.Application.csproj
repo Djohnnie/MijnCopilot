@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MediatR" Version="13.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
+		<PackageReference Include="Microsoft.SemanticKernel" Version="1.61.0" />
+		<PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.61.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\MijnCopilot.DataAccess\MijnCopilot.DataAccess.csproj" />
+	</ItemGroup>
+
+</Project>

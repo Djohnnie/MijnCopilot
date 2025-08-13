@@ -1,0 +1,73 @@
+﻿@page "/chat/{ChatId}"
+@using MediatR
+@using MijnCopilot.Application.Chats.Queries
+@using MijnCopilot.Web.Extensions
+
+@inject NavigationManager NavigationManager
+@inject IMediator Mediator
+
+<PageTitle>MijnCopilot - Chat</PageTitle>
+
+<MudContainer Class="pa-0 pa-sm-12">
+    <MudChat ChatPosition="ChatBubblePosition.Start">
+        <MudAvatar Color="Color.Default">
+            <MudIcon Icon="@Icons.Material.Filled.Webhook" Color="Color.Default" />
+        </MudAvatar>
+        <MudChatHeader Name="MijnCopilot" />
+        <MudChatBubble Color="Color.Default">
+            Waarmee kan ik je helpen?
+        </MudChatBubble>
+    </MudChat>
+
+    @foreach (var message in Messages)
+    {
+        <MudChat ChatPosition="ChatBubblePosition.End">
+            <MudAvatar Color="Color.Primary">
+                <MudIcon Icon="@Icons.Material.Filled.Face" Color="Color.Default" />
+            </MudAvatar>
+            <MudChatHeader Name="Jij" Time="@message.PostedOn.AsTimeAgo()" />
+            <MudChatBubble Color="Color.Default">
+                @message.Content
+            </MudChatBubble>
+        </MudChat>
+    }
+
+</MudContainer>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex flex-column justify-center gap-4">
+    <MudTextField T="string" Label="Stel je vraag" Variant="Variant.Outlined" @bind-Value="Request" Immediate="true" OnKeyDown="@OnKeyDown" TextUpdateSuppression="false"
+                  Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="@Icons.Material.Filled.Send" OnAdornmentClick="@AskQuestion" />
+</MudContainer>
+
+@code
+{
+    [Parameter]
+    public string ChatId { get; set; }
+
+    public List<MessageDto> Messages { get; set; } = new List<MessageDto>();
+    public string Request { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var chat = await Mediator.Send(new GetChatQuery { ChatId = Guid.Parse(ChatId) });
+        Messages = chat.Messages;
+    }
+
+    protected async Task AskQuestion()
+    {
+        if (string.IsNullOrWhiteSpace(Request))
+        {
+            return;
+        }
+
+        NavigationManager.NavigateTo($"/chat/{Guid.NewGuid()}");
+    }
+
+    protected async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await AskQuestion();
+        }
+    }
+}
