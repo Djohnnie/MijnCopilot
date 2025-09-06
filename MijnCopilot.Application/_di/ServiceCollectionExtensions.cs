@@ -19,7 +19,12 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddScoped<ICopilotHelper, CopilotHelper>();
-        services.AddScoped<IKeywordAgent, KeywordAgent>();
+        services.AddScoped<AgentFactory>();
+        services.AddScoped<IKeywordAgentFactory, KeywordAgentFactory>();
+        services.AddScoped<IGeneralAgentFactory, GeneralAgentFactory>();
+        services.AddScoped<IMijnThuisAgentFactory, MijnThuisAgentFactory>();
+        services.AddScoped<IMijnSaunaAgentFactory, MijnSaunaAgentFactory>();
+        services.AddScoped<IPhotoCarouselAgentFactory, PhotoCarouselAgentFactory>();
 
         services.AddDataService();
 

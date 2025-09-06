@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using MijnCopilot.DataAccess;
 
 namespace MijnCopilot.Application.Chats.Queries;
@@ -21,17 +22,20 @@ public class ChatDto
 
 public class GetActiveChatsQueryHandler : IRequestHandler<GetActiveChatsQuery, GetActiveChatsResponse>
 {
-    private readonly MijnCopilotDbContext _dbContext;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
     public GetActiveChatsQueryHandler(
-        MijnCopilotDbContext dbContext)
+        IServiceScopeFactory serviceScopeFactory)
     {
-        _dbContext = dbContext;
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
     public async Task<GetActiveChatsResponse> Handle(GetActiveChatsQuery request, CancellationToken cancellationToken)
     {
-        var chats = await _dbContext.Chats
+        using var scope = _serviceScopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<MijnCopilotDbContext>();
+
+        var chats = await dbContext.Chats
             .Where(x => !x.IsArchived)
             .OrderByDescending(x => x.StartedOn)
             .Select(c => new ChatDto

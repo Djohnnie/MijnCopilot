@@ -1,45 +1,16 @@
-﻿using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Agents;
-using OpenAI.Chat;
-using System.Text;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace MijnCopilot.Application.Helpers;
 
-public interface IKeywordAgent
+public interface IKeywordAgentFactory : IAgentFactory
 {
-    Task<string> GenerateKeyword(Kernel kernel, string request);
 }
 
-public class KeywordAgent : IKeywordAgent
+internal class KeywordAgentFactory : AgentFactoryBase, IKeywordAgentFactory
 {
-    public async Task<string> GenerateKeyword(Kernel kernel, string request)
-    {
-        var chatCompletionAgent = new ChatCompletionAgent
-        {
-            Name = "KeywordAgent",
-            Description = "Agent that summarizes a user request to one or two keywords",
-            Instructions = "You should summarize a user request to one or two keywords",
-            Kernel = kernel
-        };
+    protected override string AgentName => "KeywordAgent";
+    protected override string AgentDescription => "Agent that summarizes a user request to one or two keywords";
+    protected override string AgentInstruction => "You should summarize a user request to one or two keywords and start each keyword with a capital letter.";
 
-        var agentThread = new ChatHistoryAgentThread();
-        agentThread.ChatHistory.AddUserMessage(request);
-
-        var messageBuilder = new StringBuilder();
-        await foreach (var response in chatCompletionAgent.InvokeAsync(agentThread))
-        {
-            if (response.Message.Metadata.ContainsKey("Usage"))
-            {
-                var usage = response.Message.Metadata["Usage"] as ChatTokenUsage;
-                if (usage != null)
-                {
-                    //chatHistory.InputTokenCount = usage.InputTokenCount;
-                    //chatHistory.OutputTokenCount = usage.OutputTokenCount;
-                }
-            }
-            messageBuilder.Append(response.Message.Content);
-        }
-
-        return messageBuilder.ToString();
-    }
+    public KeywordAgentFactory(IConfiguration configuration) : base(configuration) { }
 }
