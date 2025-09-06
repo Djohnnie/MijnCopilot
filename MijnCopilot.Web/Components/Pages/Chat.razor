@@ -1,10 +1,13 @@
-﻿@page "/chat/{ChatId}"
-@using MediatR
+﻿@using MediatR
+@using MijnCopilot.Application.Agents.Commands
 @using MijnCopilot.Application.Chats.Queries
 @using MijnCopilot.Web.Extensions
 
 @inject NavigationManager NavigationManager
+@inject IScrollManager ScrollManager
 @inject IMediator Mediator
+
+@page "/chat/{ChatId}"
 
 <PageTitle>MijnCopilot - Chat</PageTitle>
 
@@ -21,13 +24,46 @@
 
     @foreach (var message in Messages)
     {
-        <MudChat ChatPosition="ChatBubblePosition.End">
-            <MudAvatar Color="Color.Primary">
-                <MudIcon Icon="@Icons.Material.Filled.Face" Color="Color.Default" />
+        if (!string.IsNullOrWhiteSpace(message.Content) && message.Role != ChatRole.Reduced)
+        {
+            <MudChat ChatPosition="@(message.Role == ChatRole.Assistant ? ChatBubblePosition.Start : ChatBubblePosition.End)">
+                <MudAvatar Color="Color.Default">
+                    <MudIcon Icon="@(message.Role == ChatRole.Assistant ? Icons.Material.Filled.Webhook : Icons.Material.Filled.Face)" Color="Color.Default" />
+                </MudAvatar>
+
+                @* @if (!string.IsNullOrEmpty(message.Header))
+                {
+                    <MudChatHeader Name="@(message.Role == ChatRole.Assistant ? "Quantum Summer Lab Copilot" : "You")" Time="@message.Header" />
+                } *@
+                <MudChatHeader Name="@(message.Role == ChatRole.Assistant ? "MijnCopilot" : "Jij")" />
+
+                @foreach (var sentence in message.Content.Split("[BR]", StringSplitOptions.RemoveEmptyEntries))
+                {
+                    @if (!string.IsNullOrWhiteSpace(sentence))
+                    {
+                        <MudChatBubble Color="Color.Default">
+                            @sentence.Trim()
+                        </MudChatBubble>
+                    }
+                }
+
+                @if (message.TokensUsed > 0)
+                {
+                    <MudChatFooter Text="@($"{message.TokensUsed:N0} tokens used")" />
+                }
+            </MudChat>
+        }
+    }
+
+    @if (_isLoading)
+    {
+        <MudChat ChatPosition="ChatBubblePosition.Start">
+            <MudAvatar Color="Color.Default">
+                <MudProgressCircular Size="Size.Small" Color="Color.Default" Indeterminate="true" />
             </MudAvatar>
-            <MudChatHeader Name="Jij" Time="@message.PostedOn.AsTimeAgo()" />
+
             <MudChatBubble Color="Color.Default">
-                @message.Content
+                ...
             </MudChatBubble>
         </MudChat>
     }
@@ -41,8 +77,14 @@
 
 @code
 {
+    private bool _isLoading;
+
     [Parameter]
     public string ChatId { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public bool IsChatting { get; set; } = false;
 
     public List<MessageDto> Messages { get; set; } = new List<MessageDto>();
     public string Request { get; set; }
@@ -51,6 +93,20 @@
     {
         var chat = await Mediator.Send(new GetChatQuery { ChatId = Guid.Parse(ChatId) });
         Messages = chat.Messages;
+        StateHasChanged();
+
+        if (IsChatting)
+        {
+            var request = Messages.LastOrDefault()?.Content;
+            var response = await Mediator.Send(new ChatCommand { ChatId = Guid.Parse(ChatId), Request = request });
+
+            chat = await Mediator.Send(new GetChatQuery { ChatId = Guid.Parse(ChatId) });
+            Messages = chat.Messages;
+            StateHasChanged();
+        }
+
+        await Task.Delay(500);
+        await ScrollManager.ScrollToBottomAsync("scrollableContainer", ScrollBehavior.Smooth);
     }
 
     protected async Task AskQuestion()
@@ -60,7 +116,21 @@
             return;
         }
 
-        NavigationManager.NavigateTo($"/chat/{Guid.NewGuid()}");
+        var request = Request;
+        Request = string.Empty;
+        StateHasChanged();
+
+        _isLoading = true;
+
+        var response = await Mediator.Send(new ChatCommand { ChatId = Guid.Parse(ChatId), Request = request });
+
+        var chat = await Mediator.Send(new GetChatQuery { ChatId = Guid.Parse(ChatId) });
+        Messages = chat.Messages;
+        _isLoading = false;
+        StateHasChanged();
+
+        await Task.Delay(500);
+        await ScrollManager.ScrollToBottomAsync("scrollableContainer", ScrollBehavior.Smooth);
     }
 
     protected async Task OnKeyDown(KeyboardEventArgs e)

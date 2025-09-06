@@ -87,7 +87,7 @@
         });
 
         NavigationHelper.AddLink(keyword.Keyword, $"/chat/{response.ChatId}", insert: true);
-        NavigationManager.NavigateTo($"/chat/{response.ChatId}");
+        NavigationManager.NavigateTo($"/chat/{response.ChatId}?isChatting=true");
     }
 
     protected async Task OnKeyDown(KeyboardEventArgs e)

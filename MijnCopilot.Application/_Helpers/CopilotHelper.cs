@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents.Orchestration.GroupChat;
 using Microsoft.SemanticKernel.Agents.Runtime.InProcess;
+using Microsoft.SemanticKernel.ChatCompletion;
 using System.Diagnostics;
 
 #pragma warning disable SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
@@ -35,7 +36,7 @@ public class CopilotHelper : ICopilotHelper
     public Task<string> GenerateKeyword(string request)
     {
         var agent = _agentFactory.Create(AgentType.Keyword);
-        return agent.Chat(request);
+        return agent.Chat(new ChatHistory(request, AuthorRole.User));
     }
 
     public async Task<string> Chat(string request)

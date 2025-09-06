@@ -1,7 +1,5 @@
-﻿using Microsoft.SemanticKernel.Agents;
-using Microsoft.SemanticKernel.Agents.Orchestration.GroupChat;
+﻿using Microsoft.SemanticKernel.Agents.Orchestration.GroupChat;
 using Microsoft.SemanticKernel.ChatCompletion;
-using System.Text;
 
 namespace MijnCopilot.Application.Helpers;
 
@@ -23,11 +21,14 @@ public class MyOrchestrationManager : GroupChatManager
 
     public override async ValueTask<GroupChatManagerResult<string>> SelectNextAgent(ChatHistory history, GroupChatTeam team, CancellationToken cancellationToken = default)
     {
-        var agent = _agentFactory.Create(AgentType.General);
+        var agent = _agentFactory.Create(AgentType.Orchestrator);
 
-        var response = await agent.Chat($"Based on the conversation so far, which agent is best suited to respond next? The available agents are: {string.Join(", ", team.Values.Select(a => a.Type))}. Reply with only the name of the agent.");
+        var agents = string.Join(",", team.Select(x => $"Name: {x.Key}; Description: {x.Value.Description}"));
 
-        return new GroupChatManagerResult<string>("KeywordAgent");
+        history.AddSystemMessage($"Based on the conversation so far, which agent is best suited to respond next? The available agents are: {agents}. Reply with only the name of the agent!");
+        var response = await agent.Chat(history);
+
+        return new GroupChatManagerResult<string>(response);
     }
 
     public override ValueTask<GroupChatManagerResult<bool>> ShouldRequestUserInput(ChatHistory history, CancellationToken cancellationToken = default)

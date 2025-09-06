@@ -21,7 +21,16 @@ public class GetChatResponse
 public class MessageDto
 {
     public string Content { get; set; }
+    public ChatRole Role { get; set; }
+    public int TokensUsed { get; set; }
     public DateTime PostedOn { get; set; }
+}
+
+public enum ChatRole
+{
+    User,
+    Assistant,
+    Reduced
 }
 
 public class GetChatQueryHandler : IRequestHandler<GetChatQuery, GetChatResponse>
@@ -51,7 +60,9 @@ public class GetChatQueryHandler : IRequestHandler<GetChatQuery, GetChatResponse
             .Select(m => new MessageDto
             {
                 Content = m.Content,
-                PostedOn = m.PostedOn
+                Role = m.Type == Model.MessageType.Assistant ? ChatRole.Assistant : ChatRole.User,
+                PostedOn = m.PostedOn,
+                TokensUsed = m.TokensUsed,
             })
             .ToListAsync(cancellationToken);
 

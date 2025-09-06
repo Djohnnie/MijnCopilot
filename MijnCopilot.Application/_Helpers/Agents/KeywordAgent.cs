@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace MijnCopilot.Application.Helpers;
+namespace MijnCopilot.Application.Helpers.Agents;
 
 public interface IKeywordAgentFactory : IAgentFactory
 {

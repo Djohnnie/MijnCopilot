@@ -1,11 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel.Agents;
+using Microsoft.SemanticKernel.ChatCompletion;
+using MijnCopilot.Application.Helpers.Agents;
 
 namespace MijnCopilot.Application.Helpers;
 
 public enum AgentType
 {
     Keyword,
+    Orchestrator,
     General,
     MijnThuis,
     MijnSauna,
@@ -21,7 +24,7 @@ public interface IAgent
 {
     ChatCompletionAgent Agent { get; }
 
-    Task<string> Chat(string request);
+    Task<string> Chat(ChatHistory chatHistory);
 }
 
 public class AgentFactory
@@ -40,6 +43,7 @@ public class AgentFactory
         IAgentFactory agent = type switch
         {
             AgentType.Keyword => scope.ServiceProvider.GetRequiredService<IKeywordAgentFactory>(),
+            AgentType.Orchestrator => scope.ServiceProvider.GetRequiredService<IOrchestratorAgentFactory>(),
             AgentType.General => scope.ServiceProvider.GetRequiredService<IGeneralAgentFactory>(),
             AgentType.MijnThuis => scope.ServiceProvider.GetRequiredService<IMijnThuisAgentFactory>(),
             AgentType.MijnSauna => scope.ServiceProvider.GetRequiredService<IMijnSaunaAgentFactory>(),

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using MijnCopilot.DataAccess;
 using MijnCopilot.Model;
 
@@ -18,15 +19,18 @@ public class CreateNewChatResponse
 
 public class CreateNewChatCommandHandler : IRequestHandler<CreateNewChatCommand, CreateNewChatResponse>
 {
-    private readonly MijnCopilotDbContext _dbContext;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
-    public CreateNewChatCommandHandler(MijnCopilotDbContext dbContext)
+    public CreateNewChatCommandHandler(IServiceScopeFactory serviceScopeFactory)
     {
-        _dbContext = dbContext;
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
     public async Task<CreateNewChatResponse> Handle(CreateNewChatCommand request, CancellationToken cancellationToken)
     {
+        using var scope = _serviceScopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<MijnCopilotDbContext>();
+
         var chatId = Guid.NewGuid();
         var timestamp = DateTime.UtcNow;
 
@@ -37,9 +41,9 @@ public class CreateNewChatCommandHandler : IRequestHandler<CreateNewChatCommand,
             StartedOn = timestamp,
             LastActivityOn = timestamp
         };
-        _dbContext.Chats.Add(chat);
+        dbContext.Chats.Add(chat);
 
-        _dbContext.Messages.Add(new Message
+        dbContext.Messages.Add(new Message
         {
             Id = Guid.NewGuid(),
             Chat = chat,
@@ -49,7 +53,7 @@ public class CreateNewChatCommandHandler : IRequestHandler<CreateNewChatCommand,
             Type = MessageType.User
         });
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return new CreateNewChatResponse
         {

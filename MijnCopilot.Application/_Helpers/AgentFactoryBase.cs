@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
+using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using System.Text;
 
@@ -60,10 +61,10 @@ internal class MyAgent : IAgent
         Agent = agent;
     }
 
-    public async Task<string> Chat(string request)
+    public async Task<string> Chat(ChatHistory chatHistory)
     {
         var responseBuilder = new StringBuilder();
-        await foreach (var message in Agent.InvokeAsync(request))
+        await foreach (var message in Agent.InvokeAsync(chatHistory))
         {
             responseBuilder.Append(message.Message.Content);
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MijnCopilot.Application.Helpers.Agents;
 using MijnCopilot.Application.Helpers;
 using MijnCopilot.DataAccess.DependencyInjection;
 using System.Reflection;
@@ -21,6 +22,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICopilotHelper, CopilotHelper>();
         services.AddScoped<AgentFactory>();
         services.AddScoped<IKeywordAgentFactory, KeywordAgentFactory>();
+        services.AddScoped<ISummaryAgentFactory, SummaryAgentFactory>();
+        services.AddScoped<IOrchestratorAgentFactory, OrchestratorAgentFactory>();
         services.AddScoped<IGeneralAgentFactory, GeneralAgentFactory>();
         services.AddScoped<IMijnThuisAgentFactory, MijnThuisAgentFactory>();
         services.AddScoped<IMijnSaunaAgentFactory, MijnSaunaAgentFactory>();
