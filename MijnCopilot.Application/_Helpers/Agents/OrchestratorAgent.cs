@@ -2,10 +2,7 @@
 
 namespace MijnCopilot.Application.Helpers.Agents;
 
-public interface IOrchestratorAgentFactory : IAgentFactory
-{
-    IAgent Create();
-}
+public interface IOrchestratorAgentFactory : IAgentFactory { }
 
 internal class OrchestratorAgentFactory : AgentFactoryBase, IOrchestratorAgentFactory
 {

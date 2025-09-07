@@ -2,10 +2,7 @@
 
 namespace MijnCopilot.Application.Helpers.Agents;
 
-public interface IPhotoCarouselAgentFactory : IAgentFactory
-{
-    IAgent Create();
-}
+public interface IPhotoCarouselAgentFactory : IAgentFactory { }
 
 internal class PhotoCarouselAgentFactory : AgentFactoryBase, IPhotoCarouselAgentFactory
 {
@@ -14,6 +11,10 @@ internal class PhotoCarouselAgentFactory : AgentFactoryBase, IPhotoCarouselAgent
     protected override string AgentName => "PhotoCarouselAgent";
     protected override string AgentDescription => _instructions;
     protected override string AgentInstruction => _instructions;
+    protected override bool HasPlugin => true;
+    protected override string PluginName => "PhotoCarouselPlugin";
+    protected override string McpEndpointConfig => "PHOTOCAROUSEL_MCP";
+    protected override string McpName => "PhotoCarouselMcpClient";
 
     public PhotoCarouselAgentFactory(IConfiguration configuration) : base(configuration) { }
 }

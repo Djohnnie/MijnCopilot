@@ -17,7 +17,7 @@ public enum AgentType
 
 public interface IAgentFactory
 {
-    IAgent Create();
+    Task<IAgent> Create();
 }
 
 public interface IAgent
@@ -36,7 +36,7 @@ public class AgentFactory
         _serviceScopeFactory = serviceScopeFactory;
     }
 
-    public IAgent Create(AgentType type)
+    public async Task<IAgent> Create(AgentType type)
     {
         using var scope = _serviceScopeFactory.CreateScope();
 
@@ -51,6 +51,6 @@ public class AgentFactory
             _ => throw new NotImplementedException()
         };
 
-        return agent.Create();
+        return await agent.Create();
     }
 }

@@ -21,7 +21,7 @@ public class MyOrchestrationManager : GroupChatManager
 
     public override async ValueTask<GroupChatManagerResult<string>> SelectNextAgent(ChatHistory history, GroupChatTeam team, CancellationToken cancellationToken = default)
     {
-        var agent = _agentFactory.Create(AgentType.Orchestrator);
+        var agent = await _agentFactory.Create(AgentType.Orchestrator);
 
         var agents = string.Join(",", team.Select(x => $"Name: {x.Key}; Description: {x.Value.Description}"));
 

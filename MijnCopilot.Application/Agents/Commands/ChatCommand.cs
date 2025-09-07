@@ -11,6 +11,7 @@ public class ChatCommand : IRequest<ChatResponse>
 {
     public Guid ChatId { get; set; }
     public string Request { get; set; }
+    public bool IgnoreRequest { get; set; }
 }
 
 public class ChatResponse
@@ -39,15 +40,18 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
 
         var chat = await dbContext.Chats.SingleOrDefaultAsync(x => x.Id == request.ChatId, cancellationToken);
 
-        dbContext.Messages.Add(new Message
+        if (!request.IgnoreRequest)
         {
-            Id = Guid.NewGuid(),
-            Chat = chat,
-            Content = request.Request,
-            PostedOn = DateTime.UtcNow,
-            TokensUsed = 0,
-            Type = MessageType.User
-        });
+            dbContext.Messages.Add(new Message
+            {
+                Id = Guid.NewGuid(),
+                Chat = chat,
+                Content = request.Request,
+                PostedOn = DateTime.UtcNow,
+                TokensUsed = 0,
+                Type = MessageType.User
+            });
+        }
 
         await dbContext.SaveChangesAsync(cancellationToken);
 

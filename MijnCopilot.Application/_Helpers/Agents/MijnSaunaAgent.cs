@@ -2,10 +2,7 @@
 
 namespace MijnCopilot.Application.Helpers.Agents;
 
-public interface IMijnSaunaAgentFactory : IAgentFactory
-{
-    IAgent Create();
-}
+public interface IMijnSaunaAgentFactory : IAgentFactory { }
 
 internal class MijnSaunaAgentFactory : AgentFactoryBase, IMijnSaunaAgentFactory
 {

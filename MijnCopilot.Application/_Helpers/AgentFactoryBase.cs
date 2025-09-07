@@ -4,24 +4,32 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using ModelContextProtocol.Client;
 using System.Text;
 
 namespace MijnCopilot.Application.Helpers;
 
+#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
 internal abstract class AgentFactoryBase
 {
     private readonly IConfiguration _configuration;
+    private IMcpClient _mcpClient;
 
     protected virtual string AgentName => "AGENT_NAME";
     protected virtual string AgentDescription => "AGENT_DESCRIPTION";
     protected virtual string AgentInstruction => "AGENT_INSTRUCTIONS";
+    protected virtual bool HasPlugin => false;
+    protected virtual string PluginName => "PLUGIN_NAME";
+    protected virtual string McpName => "MCP_NAME";
+    protected virtual string McpEndpointConfig => "MCP_ENDPOINT";
 
     protected AgentFactoryBase(IConfiguration configuration)
     {
         _configuration = configuration;
     }
 
-    public IAgent Create()
+    public async Task<IAgent> Create()
     {
         return new MyAgent(
             new ChatCompletionAgent
@@ -29,7 +37,7 @@ internal abstract class AgentFactoryBase
                 Name = AgentName,
                 Description = AgentDescription,
                 Instructions = AgentInstruction,
-                Kernel = InitializeKernel(),
+                Kernel = await InitializeKernel(),
                 Arguments = new KernelArguments(new OpenAIPromptExecutionSettings
                 {
                     ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
@@ -37,7 +45,7 @@ internal abstract class AgentFactoryBase
             });
     }
 
-    protected Kernel InitializeKernel()
+    protected async Task<Kernel> InitializeKernel()
     {
         var deployment = _configuration["AZUREOPENAI_DEPLOYMENT"];
         var endpoint = _configuration["AZUREOPENAI_ENDPOINT"];
@@ -46,9 +54,32 @@ internal abstract class AgentFactoryBase
         var builder = Kernel.CreateBuilder();
         builder.AddAzureOpenAIChatCompletion(deployment, endpoint, key);
         builder.Services.AddSingleton(_configuration);
-        //builder.Plugins.AddFromType<CopilotFunctions>();
+
+        if (HasPlugin)
+        {
+            var tools = await InitializeTools();
+            builder.Plugins.AddFromFunctions(PluginName, tools.Select(f => f.AsKernelFunction()));
+        }
 
         return builder.Build();
+    }
+
+    protected virtual async Task InitializeMcpClient()
+    {
+        var endpoint = _configuration.GetValue<string>(McpEndpointConfig);
+
+        _mcpClient = await McpClientFactory.CreateAsync(
+            new SseClientTransport(new()
+            {
+                Name = McpName,
+                Endpoint = new Uri(endpoint)
+            }));
+    }
+
+    protected virtual async ValueTask<IList<McpClientTool>> InitializeTools()
+    {
+        await InitializeMcpClient();
+        return await _mcpClient.ListToolsAsync();
     }
 }
 
@@ -72,3 +103,5 @@ internal class MyAgent : IAgent
         return responseBuilder.ToString();
     }
 }
+
+#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

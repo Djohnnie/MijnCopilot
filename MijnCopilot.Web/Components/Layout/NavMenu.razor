@@ -34,7 +34,7 @@
 
         response.Chats.ForEach(chat =>
         {
-            NavigationHelper.AddLink(chat.Title, $"/chat/{chat.Id}");
+            NavigationHelper.AddLink(chat.Id, chat.Title, $"/chat/{chat.Id}");
         });
     }
 

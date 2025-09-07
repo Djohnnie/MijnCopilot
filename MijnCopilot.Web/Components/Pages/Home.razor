@@ -86,7 +86,7 @@
             TokensUsed = 100
         });
 
-        NavigationHelper.AddLink(keyword.Keyword, $"/chat/{response.ChatId}", insert: true);
+        NavigationHelper.AddLink(response.ChatId, keyword.Keyword, $"/chat/{response.ChatId}", insert: true);
         NavigationManager.NavigateTo($"/chat/{response.ChatId}?isChatting=true");
     }
 

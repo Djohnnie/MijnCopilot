@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using MijnCopilot.DataAccess;
 
 namespace MijnCopilot.Application.Chats.Queries;
@@ -35,16 +36,20 @@ public enum ChatRole
 
 public class GetChatQueryHandler : IRequestHandler<GetChatQuery, GetChatResponse>
 {
-    private readonly MijnCopilotDbContext _dbContext;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
-    public GetChatQueryHandler(MijnCopilotDbContext dbContext)
+    public GetChatQueryHandler(
+        IServiceScopeFactory serviceScopeFactory)
     {
-        _dbContext = dbContext;
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
     public async Task<GetChatResponse> Handle(GetChatQuery request, CancellationToken cancellationToken)
     {
-        var chat = await _dbContext.Chats
+        using var scope = _serviceScopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<MijnCopilotDbContext>();
+        
+        var chat = await dbContext.Chats
             .Where(x => x.Id == request.ChatId && !x.IsArchived)
             .Select(c => new GetChatResponse
             {
@@ -54,7 +59,7 @@ public class GetChatQueryHandler : IRequestHandler<GetChatQuery, GetChatResponse
             })
             .SingleOrDefaultAsync(cancellationToken);
 
-        var messages = await _dbContext.Messages
+        var messages = await dbContext.Messages
             .Where(m => m.Chat.Id == request.ChatId)
             .OrderBy(m => m.PostedOn)
             .Select(m => new MessageDto

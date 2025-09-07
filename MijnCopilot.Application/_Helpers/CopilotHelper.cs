@@ -21,30 +21,28 @@ public interface ICopilotHelper
 
 public class CopilotHelper : ICopilotHelper
 {
-    private readonly IMediator _mediator;
     private readonly AgentFactory _agentFactory;
+    private readonly ChatHistory _history = new();
 
     public CopilotHelper(
-        IMediator mediator,
         AgentFactory agentFactory,
         IConfiguration configuration)
     {
-        _mediator = mediator;
         _agentFactory = agentFactory;
     }
 
-    public Task<string> GenerateKeyword(string request)
+    public async Task<string> GenerateKeyword(string request)
     {
-        var agent = _agentFactory.Create(AgentType.Keyword);
-        return agent.Chat(new ChatHistory(request, AuthorRole.User));
+        var agent = await _agentFactory.Create(AgentType.Keyword);
+        return await agent.Chat(new ChatHistory(request, AuthorRole.User));
     }
 
     public async Task<string> Chat(string request)
     {
-        var generalAgent = _agentFactory.Create(AgentType.General);
-        var mijnThuisAgent = _agentFactory.Create(AgentType.MijnThuis);
-        var mijnSaunaAgent = _agentFactory.Create(AgentType.MijnSauna);
-        var photoCarouselAgent = _agentFactory.Create(AgentType.PhotoCarousel);
+        var generalAgent = await _agentFactory.Create(AgentType.General);
+        var mijnThuisAgent = await _agentFactory.Create(AgentType.MijnThuis);
+        var mijnSaunaAgent = await _agentFactory.Create(AgentType.MijnSauna);
+        var photoCarouselAgent = await _agentFactory.Create(AgentType.PhotoCarousel);
 
         var manager = new MyOrchestrationManager(_agentFactory) { MaximumInvocationCount = 1 };
         var orchestration = new GroupChatOrchestration(manager, generalAgent.Agent, mijnThuisAgent.Agent, mijnSaunaAgent.Agent, photoCarouselAgent.Agent)
@@ -56,7 +54,6 @@ public class CopilotHelper : ICopilotHelper
         await runtime.StartAsync();
 
         var result = await orchestration.InvokeAsync(request, runtime);
-
         var response = await result.GetValueAsync();
 
         await runtime.RunUntilIdleAsync();
@@ -66,6 +63,7 @@ public class CopilotHelper : ICopilotHelper
 
     private async ValueTask responseCallback(ChatMessageContent response)
     {
+        _history.Add(response);
         Debug.WriteLine($"Response from {response.AuthorName}: {response.Content}");
     }
 }

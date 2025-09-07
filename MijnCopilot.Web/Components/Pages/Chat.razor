@@ -1,8 +1,11 @@
 ﻿@using MediatR
 @using MijnCopilot.Application.Agents.Commands
+@using MijnCopilot.Application.Chats.Commands
 @using MijnCopilot.Application.Chats.Queries
 @using MijnCopilot.Web.Extensions
+@using MijnCopilot.Web.Helpers
 
+@inject NavigationHelper NavigationHelper
 @inject NavigationManager NavigationManager
 @inject IScrollManager ScrollManager
 @inject IMediator Mediator
@@ -10,6 +13,8 @@
 @page "/chat/{ChatId}"
 
 <PageTitle>MijnCopilot - Chat</PageTitle>
+
+<MudFab Style="position:fixed; bottom:10px;right:10px;z-index:666;" Color="@Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever" DropShadow="true" OnClick="@DeleteChat" />
 
 <MudContainer Class="pa-0 pa-sm-12">
     <MudChat ChatPosition="ChatBubblePosition.Start">
@@ -97,16 +102,20 @@
 
         if (IsChatting)
         {
+            _isLoading = true;
+            StateHasChanged();
+
             var request = Messages.LastOrDefault()?.Content;
-            var response = await Mediator.Send(new ChatCommand { ChatId = Guid.Parse(ChatId), Request = request });
+            var response = await Mediator.Send(new ChatCommand { ChatId = Guid.Parse(ChatId), Request = request, IgnoreRequest = true });
 
             chat = await Mediator.Send(new GetChatQuery { ChatId = Guid.Parse(ChatId) });
             Messages = chat.Messages;
+            _isLoading = false;
             StateHasChanged();
         }
 
-        await Task.Delay(500);
-        await ScrollManager.ScrollToBottomAsync("scrollableContainer", ScrollBehavior.Smooth);
+        // await Task.Delay(500);
+        // await ScrollManager.ScrollToBottomAsync("scrollableContainer", ScrollBehavior.Smooth);
     }
 
     protected async Task AskQuestion()
@@ -118,9 +127,9 @@
 
         var request = Request;
         Request = string.Empty;
-        StateHasChanged();
 
         _isLoading = true;
+        StateHasChanged();
 
         var response = await Mediator.Send(new ChatCommand { ChatId = Guid.Parse(ChatId), Request = request });
 
@@ -139,5 +148,12 @@
         {
             await AskQuestion();
         }
+    }
+
+    protected async Task DeleteChat()
+    {
+        await Mediator.Send(new DeleteChatCommand { ChatId = Guid.Parse(ChatId) });
+        NavigationHelper.RemoveLink(Guid.Parse(ChatId));
+        NavigationManager.NavigateTo("/");
     }
 }
