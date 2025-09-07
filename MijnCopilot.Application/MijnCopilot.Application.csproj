@@ -9,10 +9,10 @@
 	<ItemGroup>
 		<PackageReference Include="MediatR" Version="13.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
-		<PackageReference Include="Microsoft.SemanticKernel" Version="1.61.0" />
-		<PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.61.0" />
-		<PackageReference Include="Microsoft.SemanticKernel.Agents.Orchestration" Version="1.62.0-preview" />
-		<PackageReference Include="Microsoft.SemanticKernel.Agents.Runtime.InProcess" Version="1.62.0-preview" />
+		<PackageReference Include="Microsoft.SemanticKernel" Version="1.64.0" />
+		<PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.64.0" />
+		<PackageReference Include="Microsoft.SemanticKernel.Agents.Orchestration" Version="1.64.0-preview" />
+		<PackageReference Include="Microsoft.SemanticKernel.Agents.Runtime.InProcess" Version="1.64.0-preview" />
 		<PackageReference Include="ModelContextProtocol" Version="0.3.0-preview.4" />
 		<PackageReference Include="ModelContextProtocol-SemanticKernel" Version="0.3.0" />
 	</ItemGroup>
