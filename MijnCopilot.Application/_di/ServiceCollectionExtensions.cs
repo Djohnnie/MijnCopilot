@@ -25,7 +25,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISummaryAgentFactory, SummaryAgentFactory>();
         services.AddScoped<IOrchestratorAgentFactory, OrchestratorAgentFactory>();
         services.AddScoped<IGeneralAgentFactory, GeneralAgentFactory>();
-        services.AddScoped<IMijnThuisAgentFactory, MijnThuisAgentFactory>();
+        services.AddScoped<IMijnThuisPowerAgentFactory, MijnThuisPowerAgentFactory>();
+        services.AddScoped<IMijnThuisSolarAgentFactory, MijnThuisSolarAgentFactory>();
+        services.AddScoped<IMijnThuisCarAgentFactory, MijnThuisCarAgentFactory>();
+        services.AddScoped<IMijnThuisHeatingAgentFactory, MijnThuisHeatingAgentFactory>();
+        services.AddScoped<IMijnThuisSmartLockAgentFactory, MijnThuisSmartLockAgentFactory>();
         services.AddScoped<IMijnSaunaAgentFactory, MijnSaunaAgentFactory>();
         services.AddScoped<IPhotoCarouselAgentFactory, PhotoCarouselAgentFactory>();
 

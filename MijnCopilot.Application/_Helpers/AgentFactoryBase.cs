@@ -23,6 +23,7 @@ internal abstract class AgentFactoryBase
     protected virtual string PluginName => "PLUGIN_NAME";
     protected virtual string McpName => "MCP_NAME";
     protected virtual string McpEndpointConfig => "MCP_ENDPOINT";
+    protected virtual string McpToolPrefix => "MCP_TOOL_PREFIX";
 
     protected AgentFactoryBase(IConfiguration configuration)
     {
@@ -79,7 +80,8 @@ internal abstract class AgentFactoryBase
     protected virtual async ValueTask<IList<McpClientTool>> InitializeTools()
     {
         await InitializeMcpClient();
-        return await _mcpClient.ListToolsAsync();
+        var tools = await _mcpClient.ListToolsAsync();
+        return tools.Where(x => string.IsNullOrEmpty(McpToolPrefix) || x.Name.StartsWith(McpToolPrefix)).ToList();
     }
 }
 

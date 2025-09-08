@@ -36,7 +36,31 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
         using var scope = _serviceScopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<MijnCopilotDbContext>();
 
-        var response = await _copilotHelper.Chat(request.Request);
+        var messages = await dbContext.Messages
+            .Where(m => m.Chat.Id == request.ChatId)
+            .OrderBy(m => m.PostedOn)
+            .ToListAsync(cancellationToken);
+
+        var chatHistory = new MyChatHistory();
+        foreach (var message in messages)
+        {
+            switch (message.Type)
+            {
+                case MessageType.User:
+                    chatHistory.AddUserMessage(message.Content);
+                    break;
+                case MessageType.Assistant:
+                    chatHistory.AddAssistantMessage(message.Content);
+                    break;
+            }
+        }
+
+        if (!request.IgnoreRequest)
+        {
+            chatHistory.AddUserMessage(request.Request);
+        }
+
+        var response = await _copilotHelper.Chat(chatHistory);
 
         var chat = await dbContext.Chats.SingleOrDefaultAsync(x => x.Id == request.ChatId, cancellationToken);
 
@@ -59,7 +83,7 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
         {
             Id = Guid.NewGuid(),
             Chat = chat,
-            Content = response,
+            Content = response.LastAssistantMessage,
             PostedOn = DateTime.UtcNow,
             TokensUsed = 0,
             Type = MessageType.Assistant
@@ -69,7 +93,7 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
 
         return new ChatResponse
         {
-            Response = response
+            Response = response.LastAssistantMessage
         };
     }
 }

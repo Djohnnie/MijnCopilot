@@ -8,9 +8,14 @@ namespace MijnCopilot.Application.Helpers;
 public enum AgentType
 {
     Keyword,
+    Summary,
     Orchestrator,
     General,
-    MijnThuis,
+    MijnThuisPower,
+    MijnThuisSolar,
+    MijnThuisCar,
+    MijnThuisHeating,
+    MijnThuisSmartLock,
     MijnSauna,
     PhotoCarousel,
 }
@@ -43,9 +48,14 @@ public class AgentFactory
         IAgentFactory agent = type switch
         {
             AgentType.Keyword => scope.ServiceProvider.GetRequiredService<IKeywordAgentFactory>(),
+            AgentType.Summary => scope.ServiceProvider.GetRequiredService<ISummaryAgentFactory>(),
             AgentType.Orchestrator => scope.ServiceProvider.GetRequiredService<IOrchestratorAgentFactory>(),
             AgentType.General => scope.ServiceProvider.GetRequiredService<IGeneralAgentFactory>(),
-            AgentType.MijnThuis => scope.ServiceProvider.GetRequiredService<IMijnThuisAgentFactory>(),
+            AgentType.MijnThuisPower => scope.ServiceProvider.GetRequiredService<IMijnThuisPowerAgentFactory>(),
+            AgentType.MijnThuisSolar => scope.ServiceProvider.GetRequiredService<IMijnThuisSolarAgentFactory>(),
+            AgentType.MijnThuisCar => scope.ServiceProvider.GetRequiredService<IMijnThuisCarAgentFactory>(),
+            AgentType.MijnThuisHeating => scope.ServiceProvider.GetRequiredService<IMijnThuisHeatingAgentFactory>(),
+            AgentType.MijnThuisSmartLock => scope.ServiceProvider.GetRequiredService<IMijnThuisSmartLockAgentFactory>(),
             AgentType.MijnSauna => scope.ServiceProvider.GetRequiredService<IMijnSaunaAgentFactory>(),
             AgentType.PhotoCarousel => scope.ServiceProvider.GetRequiredService<IPhotoCarouselAgentFactory>(),
             _ => throw new NotImplementedException()
