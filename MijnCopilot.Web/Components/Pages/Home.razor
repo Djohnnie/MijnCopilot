@@ -82,8 +82,7 @@
         var response = await Mediator.Send(new CreateNewChatCommand
         {
             Title = keyword.Keyword,
-            Request = _request,
-            TokensUsed = 100
+            Request = _request
         });
 
         NavigationHelper.AddLink(response.ChatId, keyword.Keyword, $"/chat/{response.ChatId}", insert: true);

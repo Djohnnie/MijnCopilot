@@ -6,7 +6,7 @@ public interface IPhotoCarouselAgentFactory : IAgentFactory { }
 
 internal class PhotoCarouselAgentFactory : AgentFactoryBase, IPhotoCarouselAgentFactory
 {
-    private string _description = "An agent that has real-time knowledge on my displayed photos via PhotoCarousel";
+    private string _description = "An agent that has real-time knowledge on my displayed photos via PhotoCarousel (get information about current, previous and next displayed photo)";
     private string _instructions = @"
 You should answer questions and execute commands regarding photos shown on my photo carousel:
 - What is the current photo being shown

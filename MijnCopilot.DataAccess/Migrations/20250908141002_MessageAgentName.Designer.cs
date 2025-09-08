@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MijnCopilot.DataAccess;
 
@@ -11,9 +12,11 @@ using MijnCopilot.DataAccess;
 namespace MijnCopilot.DataAccess.Migrations
 {
     [DbContext(typeof(MijnCopilotDbContext))]
-    partial class MijnCopilotDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250908141002_MessageAgentName")]
+    partial class MessageAgentName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

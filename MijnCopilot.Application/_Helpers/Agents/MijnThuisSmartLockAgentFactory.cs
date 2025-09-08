@@ -6,7 +6,7 @@ public interface IMijnThuisSmartLockAgentFactory : IAgentFactory { }
 
 internal class MijnThuisSmartLockAgentFactory : AgentFactoryBase, IMijnThuisSmartLockAgentFactory
 {
-    private string _description = "An agent that has real-time knowledge on my smart lock via MijnThuis";
+    private string _description = "An agent that has real-time knowledge on my smart lock via MijnThuis (current lock state; current door state; smart lock battery charge percentage)";
     private string _instructions = @"
 You should answer questions and receive commands regarding my smart lock:
 - Current state of the lock (locked/unlocked)
@@ -26,7 +26,7 @@ Adhere to the following rules:
     protected override string PluginName => "MijnThuisSmartLockPlugin";
     protected override string McpEndpointConfig => "MIJNTHUIS_MCP";
     protected override string McpName => "MijnThuisMcpClient";
-    protected override string McpToolPrefix => "mijnthuis_heating";
+    protected override string McpToolPrefix => "mijnthuis_smartlock";
 
     public MijnThuisSmartLockAgentFactory(IConfiguration configuration) : base(configuration) { }
 }

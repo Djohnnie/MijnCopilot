@@ -3,7 +3,6 @@ using Microsoft.SemanticKernel.Agents.Orchestration.GroupChat;
 using Microsoft.SemanticKernel.Agents.Runtime.InProcess;
 using Microsoft.SemanticKernel.ChatCompletion;
 using OpenAI.Chat;
-using System.Diagnostics;
 
 #pragma warning disable SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
@@ -21,7 +20,9 @@ public interface ICopilotHelper
 public class CopilotHelper : ICopilotHelper
 {
     private readonly AgentFactory _agentFactory;
-    private readonly ChatHistory _history = new();
+    private string _lastAgentName = string.Empty;
+    private int _inputTokenCount = 0;
+    private int _outputTokenCount = 0;
 
     public CopilotHelper(
         AgentFactory agentFactory,
@@ -38,8 +39,10 @@ public class CopilotHelper : ICopilotHelper
 
     public async Task<MyChatHistory> Chat(MyChatHistory history)
     {
-        // Start by clearing the internal orchestrator history for this session.
-        _history.Clear();
+        // Start by resetting the internal statistics for this session.
+        _lastAgentName = string.Empty;
+        _inputTokenCount = 0;
+        _outputTokenCount = 0;
 
         // Use the agent factory to create the agents needed for the orchestration.
         var generalAgent = await _agentFactory.Create(AgentType.General);
@@ -53,7 +56,10 @@ public class CopilotHelper : ICopilotHelper
 
         // Create the orchestration manager and the orchestration itself.
         var manager = new MyOrchestrationManager(_agentFactory) { MaximumInvocationCount = 1 };
-        var orchestration = new GroupChatOrchestration(manager, generalAgent.Agent, mijnThuisPowerAgent.Agent, mijnThuisSolarAgent.Agent, mijnThuisCarAgent.Agent, mijnThuisHeatingAgent.Agent, mijnThuisSmartLockAgent.Agent, mijnSaunaAgent.Agent, photoCarouselAgent.Agent)
+        var orchestration = new GroupChatOrchestration(manager,
+            generalAgent.Agent, mijnThuisPowerAgent.Agent, mijnThuisSolarAgent.Agent,
+            mijnThuisCarAgent.Agent, mijnThuisHeatingAgent.Agent, mijnThuisSmartLockAgent.Agent,
+            mijnSaunaAgent.Agent, photoCarouselAgent.Agent)
         {
             ResponseCallback = responseCallback,
         };
@@ -72,28 +78,13 @@ public class CopilotHelper : ICopilotHelper
         // Ensure all asynchronous operations are completed.
         await runtime.RunUntilIdleAsync();
 
-        foreach (var entry in _history)
-        {
-            var inputTokenCount = 0;
-            var outputTokenCount = 0;
-
-            if (entry.Metadata != null && entry.Metadata.ContainsKey("Usage"))
-            {
-                var usage = entry.Metadata["Usage"] as ChatTokenUsage;
-                if (usage != null)
-                {
-                    inputTokenCount = usage.InputTokenCount;
-                    outputTokenCount = usage.OutputTokenCount;
-                }
-            }
-
-            Debug.WriteLine($"{entry.AuthorName}: {entry.Content} ({inputTokenCount}/{outputTokenCount})");
-        }
-
         // Add the response to a copy of the provided history and return it.
         var newHistory = history.Copy();
         newHistory.AddAssistantMessage(response);
         newHistory.LastAssistantMessage = response;
+        newHistory.AgentName = _lastAgentName;
+        newHistory.InputTokenCount = _inputTokenCount;
+        newHistory.OutputTokenCount = _outputTokenCount;
 
         return newHistory;
     }
@@ -106,8 +97,17 @@ public class CopilotHelper : ICopilotHelper
 
     private async ValueTask responseCallback(Microsoft.SemanticKernel.ChatMessageContent response)
     {
-        _history.Add(response);
-        //Debug.WriteLine($"Response from {response.AuthorName}: {response.Content}");
+        _lastAgentName = response.AuthorName ?? string.Empty;
+
+        if (response.Metadata != null && response.Metadata.ContainsKey("Usage"))
+        {
+            var usage = response.Metadata["Usage"] as ChatTokenUsage;
+            if (usage != null)
+            {
+                _inputTokenCount += usage.InputTokenCount;
+                _outputTokenCount += usage.OutputTokenCount;
+            }
+        }
     }
 }
 

@@ -48,6 +48,7 @@ public class CreateNewChatCommandHandler : IRequestHandler<CreateNewChatCommand,
             Id = Guid.NewGuid(),
             Chat = chat,
             Content = request.Request,
+            AgentName = string.Empty,
             PostedOn = timestamp,
             TokensUsed = request.TokensUsed,
             Type = MessageType.User

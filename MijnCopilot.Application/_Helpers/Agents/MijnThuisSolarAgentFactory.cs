@@ -6,7 +6,7 @@ public interface IMijnThuisSolarAgentFactory : IAgentFactory { }
 
 internal class MijnThuisSolarAgentFactory : AgentFactoryBase, IMijnThuisSolarAgentFactory
 {
-    private string _description = "An agent that has real-time knowledge on my solar installation via MijnThuis";
+    private string _description = "An agent that has real-time knowledge on my solar installation via MijnThuis (current solar production; current battery power; current grid power; solar/home battery charge percentage and health; solar energy production today and this month; solar energy forecast today and tomorrow)";
     private string _instructions = @"
 You should answer questions and receive commands regarding my solar installation:
 - Solar power production, battery power and grid power

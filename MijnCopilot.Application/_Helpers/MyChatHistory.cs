@@ -6,6 +6,9 @@ public class MyChatHistory
 {
     public List<MyChat> Messages { get; private set; } = new List<MyChat>();
     public string LastAssistantMessage { get; set; }
+    public string AgentName { get; set; }
+    public int InputTokenCount { get; set; }
+    public int OutputTokenCount { get; set; }
 
     public int MessageCount => Messages.Count;
 

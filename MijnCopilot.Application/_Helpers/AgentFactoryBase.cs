@@ -5,6 +5,7 @@ using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using ModelContextProtocol.Client;
+using System.Diagnostics;
 using System.Text;
 
 namespace MijnCopilot.Application.Helpers;
@@ -23,7 +24,7 @@ internal abstract class AgentFactoryBase
     protected virtual string PluginName => "PLUGIN_NAME";
     protected virtual string McpName => "MCP_NAME";
     protected virtual string McpEndpointConfig => "MCP_ENDPOINT";
-    protected virtual string McpToolPrefix => "MCP_TOOL_PREFIX";
+    protected virtual string McpToolPrefix => string.Empty;
 
     protected AgentFactoryBase(IConfiguration configuration)
     {
@@ -102,7 +103,9 @@ internal class MyAgent : IAgent
             responseBuilder.Append(message.Message.Content);
         }
 
-        return responseBuilder.ToString();
+        var response = responseBuilder.ToString();
+        Debug.WriteLine($"[{Agent.Name}] {chatHistory.First().Content} -> {response}");
+        return response;
     }
 }
 

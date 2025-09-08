@@ -6,7 +6,7 @@ public interface IMijnThuisHeatingAgentFactory : IAgentFactory { }
 
 internal class MijnThuisHeatingAgentFactory : AgentFactoryBase, IMijnThuisHeatingAgentFactory
 {
-    private string _description = "An agent that has real-time knowledge on my heating installation via MijnThuis";
+    private string _description = "An agent that has real-time knowledge on my heating installation via MijnThuis (current temperature in my home and outside; current setpoint temperature and next setpoint temperature; next setpoint scheduled time)";
     private string _instructions = @"
 You should answer questions and receive commands regarding my heating installation:
 - Current temperature in my home

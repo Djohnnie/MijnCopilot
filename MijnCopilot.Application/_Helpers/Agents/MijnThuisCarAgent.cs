@@ -6,7 +6,7 @@ public interface IMijnThuisCarAgentFactory : IAgentFactory { }
 
 internal class MijnThuisCarAgentFactory : AgentFactoryBase, IMijnThuisCarAgentFactory
 {
-    private string _description = "An agent that has real-time knowledge on my electric car via MijnThuis";
+    private string _description = "An agent that has real-time knowledge on my electric car via MijnThuis (current car location; car battery charge percentage and health; locking and unlocking car; starting and stopping car charging)";
     private string _instructions = @"
 You should answer questions and receive commands regarding my electric car:
 - Current location of my car

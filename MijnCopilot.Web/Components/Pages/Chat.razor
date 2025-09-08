@@ -36,11 +36,15 @@
                     <MudIcon Icon="@(message.Role == ChatRole.Assistant ? Icons.Material.Filled.Webhook : Icons.Material.Filled.Face)" Color="Color.Default" />
                 </MudAvatar>
 
-                @* @if (!string.IsNullOrEmpty(message.Header))
+                @if (!string.IsNullOrEmpty(message.AgentName))
                 {
-                    <MudChatHeader Name="@(message.Role == ChatRole.Assistant ? "Quantum Summer Lab Copilot" : "You")" Time="@message.Header" />
-                } *@
-                <MudChatHeader Name="@(message.Role == ChatRole.Assistant ? "MijnCopilot" : "Jij")" />
+                    <MudChatHeader Name="@(message.Role == ChatRole.Assistant ? message.AgentName : "You")" Time="Zoveel seconden geleden" />
+                }
+
+                @if (message.Role == ChatRole.User)
+                {
+                    <MudChatHeader Name="Jij" Time="Zoveel seconden geleden" />
+                }
 
                 @foreach (var sentence in message.Content.Split("[BR]", StringSplitOptions.RemoveEmptyEntries))
                 {
@@ -126,6 +130,12 @@
         }
 
         var request = Request;
+        Messages.Add(new MessageDto
+        {
+            Role = ChatRole.User,
+            Content = request,
+            PostedOn = DateTime.UtcNow
+        });
         Request = string.Empty;
 
         _isLoading = true;

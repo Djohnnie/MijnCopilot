@@ -60,7 +60,7 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
             chatHistory.AddUserMessage(request.Request);
         }
 
-        var response = await _copilotHelper.Chat(chatHistory);
+        var copilotResponse = await _copilotHelper.Chat(chatHistory);
 
         var chat = await dbContext.Chats.SingleOrDefaultAsync(x => x.Id == request.ChatId, cancellationToken);
 
@@ -71,8 +71,9 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
                 Id = Guid.NewGuid(),
                 Chat = chat,
                 Content = request.Request,
+                AgentName = string.Empty,
                 PostedOn = DateTime.UtcNow,
-                TokensUsed = 0,
+                TokensUsed = copilotResponse.InputTokenCount,
                 Type = MessageType.User
             });
         }
@@ -83,9 +84,10 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
         {
             Id = Guid.NewGuid(),
             Chat = chat,
-            Content = response.LastAssistantMessage,
+            Content = copilotResponse.LastAssistantMessage,
+            AgentName = GetAgentName(copilotResponse.AgentName),
             PostedOn = DateTime.UtcNow,
-            TokensUsed = 0,
+            TokensUsed = copilotResponse.OutputTokenCount,
             Type = MessageType.Assistant
         });
 
@@ -93,7 +95,23 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
 
         return new ChatResponse
         {
-            Response = response.LastAssistantMessage
+            Response = copilotResponse.LastAssistantMessage
+        };
+    }
+
+    public static string GetAgentName(string internalName)
+    {
+        return internalName switch
+        {
+            "GeneralAgent" => "General",
+            "MijnThuisPowerAgent" => "MijnThuis - Power",
+            "MijnThuisSolarAgent" => "MijnThuis - Solar",
+            "MijnThuisCarAgent" => "MijnThuis - Car",
+            "MijnThuisHeatingAgent" => "MijnThuis - Heating",
+            "MijnThuisSmartLockAgent" => "MijnThuis - SmartLock",
+            "MijnSaunaAgent" => "MijnSauna",
+            "PhotoCarouselAgent" => "PhotoCarousel",
+            _ => internalName
         };
     }
 }

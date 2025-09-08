@@ -22,6 +22,7 @@ public class GetChatResponse
 public class MessageDto
 {
     public string Content { get; set; }
+    public string AgentName { get; set; }
     public ChatRole Role { get; set; }
     public int TokensUsed { get; set; }
     public DateTime PostedOn { get; set; }
@@ -48,7 +49,7 @@ public class GetChatQueryHandler : IRequestHandler<GetChatQuery, GetChatResponse
     {
         using var scope = _serviceScopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<MijnCopilotDbContext>();
-        
+
         var chat = await dbContext.Chats
             .Where(x => x.Id == request.ChatId && !x.IsArchived)
             .Select(c => new GetChatResponse
@@ -65,6 +66,7 @@ public class GetChatQueryHandler : IRequestHandler<GetChatQuery, GetChatResponse
             .Select(m => new MessageDto
             {
                 Content = m.Content,
+                AgentName = m.AgentName,
                 Role = m.Type == Model.MessageType.Assistant ? ChatRole.Assistant : ChatRole.User,
                 PostedOn = m.PostedOn,
                 TokensUsed = m.TokensUsed,

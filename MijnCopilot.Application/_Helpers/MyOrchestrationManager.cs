@@ -25,8 +25,10 @@ public class MyOrchestrationManager : GroupChatManager
 
         var agents = string.Join(",", team.Select(x => $"Name: {x.Key}; Description: {x.Value.Description}"));
 
-        history.AddSystemMessage($"Based on the conversation so far, which agent is best suited to respond next? The available agents are: {agents}. Reply with only the name of the agent!");
-        var response = await agent.Chat(history);
+        var chatHistory = new ChatHistory();
+        chatHistory.AddSystemMessage($"Based on the conversation so far, which agent is best suited to respond next? The available agents are: {agents}. Reply with only the name of the agent!");
+        chatHistory.AddUserMessage(history.Single().Content);
+        var response = await agent.Chat(chatHistory);
 
         return new GroupChatManagerResult<string>(response);
     }

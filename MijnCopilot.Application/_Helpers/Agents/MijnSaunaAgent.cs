@@ -6,7 +6,7 @@ public interface IMijnSaunaAgentFactory : IAgentFactory { }
 
 internal class MijnSaunaAgentFactory : AgentFactoryBase, IMijnSaunaAgentFactory
 {
-    private string _description = "An agent that has real-time knowledge on my sauna via MijnSauna";
+    private string _description = "An agent that has real-time knowledge on my sauna via MijnSauna (sauna status: off, sauna or infrared; current temperature inside sauna cabin)";
     private string _instructions = @"
 You should answer questions and execute commands regarding my sauna:
 - Temperature inside the sauna cabin
