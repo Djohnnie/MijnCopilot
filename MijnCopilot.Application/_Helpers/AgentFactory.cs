@@ -10,6 +10,8 @@ public enum AgentType
     Keyword,
     Summary,
     Orchestrator,
+    Question,
+    Reply,
     General,
     MijnThuisPower,
     MijnThuisSolar,
@@ -29,7 +31,7 @@ public interface IAgent
 {
     ChatCompletionAgent Agent { get; }
 
-    Task<string> Chat(ChatHistory chatHistory);
+    Task<MyAgentResponse> Chat(ChatHistory chatHistory);
 }
 
 public class AgentFactory
@@ -50,6 +52,8 @@ public class AgentFactory
             AgentType.Keyword => scope.ServiceProvider.GetRequiredService<IKeywordAgentFactory>(),
             AgentType.Summary => scope.ServiceProvider.GetRequiredService<ISummaryAgentFactory>(),
             AgentType.Orchestrator => scope.ServiceProvider.GetRequiredService<IOrchestratorAgentFactory>(),
+            AgentType.Question => scope.ServiceProvider.GetRequiredService<IQuestionAgentFactory>(),
+            AgentType.Reply => scope.ServiceProvider.GetRequiredService<IReplyAgentFactory>(),
             AgentType.General => scope.ServiceProvider.GetRequiredService<IGeneralAgentFactory>(),
             AgentType.MijnThuisPower => scope.ServiceProvider.GetRequiredService<IMijnThuisPowerAgentFactory>(),
             AgentType.MijnThuisSolar => scope.ServiceProvider.GetRequiredService<IMijnThuisSolarAgentFactory>(),

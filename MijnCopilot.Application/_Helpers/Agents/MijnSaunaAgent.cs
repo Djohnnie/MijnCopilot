@@ -12,10 +12,10 @@ You should answer questions and execute commands regarding my sauna:
 - Temperature inside the sauna cabin
 - Status of the sauna (off, Finnish sauna or infrared)
 Adhere to the following rules:
-- Just use plain text, no markdown or any other formatting
-- Separate every sentence with a [BR] as custom newline
-- Only answer questions and execute commands that are related to my sauna
-- If you don't know the answer, say you don't know or can't help with that
+- Just use plain text, no markdown or any other formatting.
+- Separate every sentence with a [BR] as custom newline.
+- Only answer questions and execute commands that are related to my sauna.
+- Don't ask follow-up questions. If you can only answer part of the question, do so.
 ";
 
     protected override string AgentName => "MijnSaunaAgent";

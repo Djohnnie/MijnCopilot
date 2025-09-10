@@ -9,27 +9,27 @@ public static class DateTimeExtensions
 
         return timeSpan.TotalSeconds switch
         {
-            <= 1 => "just now",
-            <= 60 => $"{timeSpan.Seconds} seconds ago",
+            <= 1 => "zojuist",
+            <= 60 => $"{timeSpan.Seconds} seconden geleden",
 
             _ => timeSpan.TotalMinutes switch
             {
-                <= 1 => "about a minute ago",
-                < 60 => $"about {timeSpan.Minutes} minutes ago",
+                <= 1 => "ongeveer een minuut geleden",
+                < 60 => $"ongeveer {timeSpan.Minutes} minuten geleden",
                 _ => timeSpan.TotalHours switch
                 {
-                    <= 1 => "about an hour ago",
-                    < 24 => $"about {timeSpan.Hours} hours ago",
+                    <= 1 => "ongeveer een uur geleden",
+                    < 24 => $"ongeveer {timeSpan.Hours} uren geleden",
                     _ => timeSpan.TotalDays switch
                     {
-                        <= 1 => "yesterday",
-                        <= 30 => $"about {timeSpan.Days} days ago",
+                        <= 1 => "gisteren",
+                        <= 30 => $"ongeveer {timeSpan.Days} dagen geleden",
 
-                        <= 60 => "about a month ago",
-                        < 365 => $"about {timeSpan.Days / 30} months ago",
+                        <= 60 => "ongeveer een maand geleden",
+                        < 365 => $"ongeveer {timeSpan.Days / 30} maanden geleden",
 
-                        <= 365 * 2 => "about a year ago",
-                        _ => $"about {timeSpan.Days / 365} years ago"
+                        <= 365 * 2 => "ongeveer een jaar geleden",
+                        _ => $"ongeveer {timeSpan.Days / 365} jaren geleden"
                     }
                 }
             }

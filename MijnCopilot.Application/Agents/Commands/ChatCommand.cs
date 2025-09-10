@@ -77,6 +77,20 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
                 Type = MessageType.User
             });
         }
+        else
+        {
+            var message = await dbContext.Messages
+                .Where(m => m.Chat.Id == request.ChatId)
+                .OrderByDescending(m => m.PostedOn)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (message != null)
+            {
+                message.AgentName = copilotResponse.AgentName;
+                message.TokensUsed += copilotResponse.InputTokenCount;
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+        }
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -85,7 +99,7 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
             Id = Guid.NewGuid(),
             Chat = chat,
             Content = copilotResponse.LastAssistantMessage,
-            AgentName = GetAgentName(copilotResponse.AgentName),
+            AgentName = copilotResponse.AgentName,
             PostedOn = DateTime.UtcNow,
             TokensUsed = copilotResponse.OutputTokenCount,
             Type = MessageType.Assistant
@@ -96,22 +110,6 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
         return new ChatResponse
         {
             Response = copilotResponse.LastAssistantMessage
-        };
-    }
-
-    public static string GetAgentName(string internalName)
-    {
-        return internalName switch
-        {
-            "GeneralAgent" => "General",
-            "MijnThuisPowerAgent" => "MijnThuis - Power",
-            "MijnThuisSolarAgent" => "MijnThuis - Solar",
-            "MijnThuisCarAgent" => "MijnThuis - Car",
-            "MijnThuisHeatingAgent" => "MijnThuis - Heating",
-            "MijnThuisSmartLockAgent" => "MijnThuis - SmartLock",
-            "MijnSaunaAgent" => "MijnSauna",
-            "PhotoCarouselAgent" => "PhotoCarousel",
-            _ => internalName
         };
     }
 }

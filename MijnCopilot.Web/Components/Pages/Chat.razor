@@ -17,153 +17,153 @@
 <MudFab Style="position:fixed; bottom:10px;right:10px;z-index:666;" Color="@Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever" DropShadow="true" OnClick="@DeleteChat" />
 
 <MudContainer Class="pa-0 pa-sm-12">
-    <MudChat ChatPosition="ChatBubblePosition.Start">
-        <MudAvatar Color="Color.Default">
-            <MudIcon Icon="@Icons.Material.Filled.Webhook" Color="Color.Default" />
-        </MudAvatar>
-        <MudChatHeader Name="MijnCopilot" />
-        <MudChatBubble Color="Color.Default">
-            Waarmee kan ik je helpen?
-        </MudChatBubble>
-    </MudChat>
+	<MudChat ChatPosition="ChatBubblePosition.Start">
+		<MudAvatar Color="Color.Default">
+			<MudIcon Icon="@Icons.Material.Filled.Webhook" Color="Color.Default" />
+		</MudAvatar>
+		<MudChatHeader Name="MijnCopilot" />
+		<MudChatBubble Color="Color.Default">
+			Waarmee kan ik je helpen?
+		</MudChatBubble>
+	</MudChat>
 
-    @foreach (var message in Messages)
-    {
-        if (!string.IsNullOrWhiteSpace(message.Content) && message.Role != ChatRole.Reduced)
-        {
-            <MudChat ChatPosition="@(message.Role == ChatRole.Assistant ? ChatBubblePosition.Start : ChatBubblePosition.End)">
-                <MudAvatar Color="Color.Default">
-                    <MudIcon Icon="@(message.Role == ChatRole.Assistant ? Icons.Material.Filled.Webhook : Icons.Material.Filled.Face)" Color="Color.Default" />
-                </MudAvatar>
+	@foreach (var message in Messages)
+	{
+		if (!string.IsNullOrWhiteSpace(message.Content) && message.Role != ChatRole.Reduced)
+		{
+			<MudChat ChatPosition="@(message.Role == ChatRole.Assistant ? ChatBubblePosition.Start : ChatBubblePosition.End)">
+				<MudAvatar Color="Color.Default">
+					<MudIcon Icon="@(message.Role == ChatRole.Assistant ? Icons.Material.Filled.Webhook : Icons.Material.Filled.Face)" Color="Color.Default" />
+				</MudAvatar>
 
-                @if (!string.IsNullOrEmpty(message.AgentName))
-                {
-                    <MudChatHeader Name="@(message.Role == ChatRole.Assistant ? message.AgentName : "You")" Time="Zoveel seconden geleden" />
-                }
+				@if (!string.IsNullOrEmpty(message.AgentName))
+				{
+					<MudChatHeader Name="@(message.Role == ChatRole.Assistant ? message.AgentName : "Jij")" Time="@message.PostedOn.AsTimeAgo()" />
+				}
 
-                @if (message.Role == ChatRole.User)
-                {
-                    <MudChatHeader Name="Jij" Time="Zoveel seconden geleden" />
-                }
+				@if (message.Role == ChatRole.User)
+				{
+					<MudChatHeader Name="Jij" Time="@message.PostedOn.AsTimeAgo()" />
+				}
 
-                @foreach (var sentence in message.Content.Split("[BR]", StringSplitOptions.RemoveEmptyEntries))
-                {
-                    @if (!string.IsNullOrWhiteSpace(sentence))
-                    {
-                        <MudChatBubble Color="Color.Default">
-                            @sentence.Trim()
-                        </MudChatBubble>
-                    }
-                }
+				@foreach (var sentence in message.Content.Split("[BR]", StringSplitOptions.RemoveEmptyEntries))
+				{
+					@if (!string.IsNullOrWhiteSpace(sentence))
+					{
+						<MudChatBubble Color="Color.Default">
+							@sentence.Trim()
+						</MudChatBubble>
+					}
+				}
 
-                @if (message.TokensUsed > 0)
-                {
-                    <MudChatFooter Text="@($"{message.TokensUsed:N0} tokens used")" />
-                }
-            </MudChat>
-        }
-    }
+				@if (message.TokensUsed > 0)
+				{
+					<MudChatFooter Text="@($"{message.TokensUsed:N0} tokens gebruikt")" />
+				}
+			</MudChat>
+		}
+	}
 
-    @if (_isLoading)
-    {
-        <MudChat ChatPosition="ChatBubblePosition.Start">
-            <MudAvatar Color="Color.Default">
-                <MudProgressCircular Size="Size.Small" Color="Color.Default" Indeterminate="true" />
-            </MudAvatar>
+	@if (_isLoading)
+	{
+		<MudChat ChatPosition="ChatBubblePosition.Start">
+			<MudAvatar Color="Color.Default">
+				<MudProgressCircular Size="Size.Small" Color="Color.Default" Indeterminate="true" />
+			</MudAvatar>
 
-            <MudChatBubble Color="Color.Default">
-                ...
-            </MudChatBubble>
-        </MudChat>
-    }
+			<MudChatBubble Color="Color.Default">
+				...
+			</MudChatBubble>
+		</MudChat>
+	}
 
 </MudContainer>
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex flex-column justify-center gap-4">
-    <MudTextField T="string" Label="Stel je vraag" Variant="Variant.Outlined" @bind-Value="Request" Immediate="true" OnKeyDown="@OnKeyDown" TextUpdateSuppression="false"
-                  Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="@Icons.Material.Filled.Send" OnAdornmentClick="@AskQuestion" />
+	<MudTextField T="string" Label="Stel je vraag" Variant="Variant.Outlined" @bind-Value="Request" Immediate="true" OnKeyDown="@OnKeyDown" TextUpdateSuppression="false"
+				  Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="@Icons.Material.Filled.Send" OnAdornmentClick="@AskQuestion" />
 </MudContainer>
 
 @code
 {
-    private bool _isLoading;
+	private bool _isLoading;
 
-    [Parameter]
-    public string ChatId { get; set; }
+	[Parameter]
+	public string ChatId { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public bool IsChatting { get; set; } = false;
+	[Parameter]
+	[SupplyParameterFromQuery]
+	public bool IsChatting { get; set; } = false;
 
-    public List<MessageDto> Messages { get; set; } = new List<MessageDto>();
-    public string Request { get; set; }
+	public List<MessageDto> Messages { get; set; } = new List<MessageDto>();
+	public string Request { get; set; }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        var chat = await Mediator.Send(new GetChatQuery { ChatId = Guid.Parse(ChatId) });
-        Messages = chat.Messages;
-        StateHasChanged();
+	protected override async Task OnParametersSetAsync()
+	{
+		var chat = await Mediator.Send(new GetChatQuery { ChatId = Guid.Parse(ChatId) });
+		Messages = chat.Messages;
+		StateHasChanged();
 
-        if (IsChatting)
-        {
-            _isLoading = true;
-            StateHasChanged();
+		if (IsChatting)
+		{
+			_isLoading = true;
+			StateHasChanged();
 
-            var request = Messages.LastOrDefault()?.Content;
-            var response = await Mediator.Send(new ChatCommand { ChatId = Guid.Parse(ChatId), Request = request, IgnoreRequest = true });
+			var request = Messages.LastOrDefault()?.Content;
+			var response = await Mediator.Send(new ChatCommand { ChatId = Guid.Parse(ChatId), Request = request, IgnoreRequest = true });
 
-            chat = await Mediator.Send(new GetChatQuery { ChatId = Guid.Parse(ChatId) });
-            Messages = chat.Messages;
-            _isLoading = false;
-            StateHasChanged();
-        }
+			chat = await Mediator.Send(new GetChatQuery { ChatId = Guid.Parse(ChatId) });
+			Messages = chat.Messages;
+			_isLoading = false;
+			StateHasChanged();
+		}
 
-        // await Task.Delay(500);
-        // await ScrollManager.ScrollToBottomAsync("scrollableContainer", ScrollBehavior.Smooth);
-    }
+		// await Task.Delay(500);
+		// await ScrollManager.ScrollToBottomAsync("scrollableContainer", ScrollBehavior.Smooth);
+	}
 
-    protected async Task AskQuestion()
-    {
-        if (string.IsNullOrWhiteSpace(Request))
-        {
-            return;
-        }
+	protected async Task AskQuestion()
+	{
+		if (string.IsNullOrWhiteSpace(Request))
+		{
+			return;
+		}
 
-        var request = Request;
-        Messages.Add(new MessageDto
-        {
-            Role = ChatRole.User,
-            Content = request,
-            PostedOn = DateTime.UtcNow
-        });
-        Request = string.Empty;
+		var request = Request;
+		Messages.Add(new MessageDto
+		{
+			Role = ChatRole.User,
+			Content = request,
+			PostedOn = DateTime.UtcNow
+		});
+		Request = string.Empty;
 
-        _isLoading = true;
-        StateHasChanged();
+		_isLoading = true;
+		StateHasChanged();
 
-        var response = await Mediator.Send(new ChatCommand { ChatId = Guid.Parse(ChatId), Request = request });
+		var response = await Mediator.Send(new ChatCommand { ChatId = Guid.Parse(ChatId), Request = request });
 
-        var chat = await Mediator.Send(new GetChatQuery { ChatId = Guid.Parse(ChatId) });
-        Messages = chat.Messages;
-        _isLoading = false;
-        StateHasChanged();
+		var chat = await Mediator.Send(new GetChatQuery { ChatId = Guid.Parse(ChatId) });
+		Messages = chat.Messages;
+		_isLoading = false;
+		StateHasChanged();
 
-        await Task.Delay(500);
-        await ScrollManager.ScrollToBottomAsync("scrollableContainer", ScrollBehavior.Smooth);
-    }
+		await Task.Delay(500);
+		await ScrollManager.ScrollToBottomAsync("scrollableContainer", ScrollBehavior.Smooth);
+	}
 
-    protected async Task OnKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-        {
-            await AskQuestion();
-        }
-    }
+	protected async Task OnKeyDown(KeyboardEventArgs e)
+	{
+		if (e.Key == "Enter")
+		{
+			await AskQuestion();
+		}
+	}
 
-    protected async Task DeleteChat()
-    {
-        await Mediator.Send(new DeleteChatCommand { ChatId = Guid.Parse(ChatId) });
-        NavigationHelper.RemoveLink(Guid.Parse(ChatId));
-        NavigationManager.NavigateTo("/");
-    }
+	protected async Task DeleteChat()
+	{
+		await Mediator.Send(new DeleteChatCommand { ChatId = Guid.Parse(ChatId) });
+		NavigationHelper.RemoveLink(Guid.Parse(ChatId));
+		NavigationManager.NavigateTo("/");
+	}
 }

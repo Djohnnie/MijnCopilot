@@ -11,6 +11,7 @@ public class GenerateKeywordFromRequestCommand : IRequest<GenerateKeywordFromReq
 public class GenerateKeywordFromRequestResponse
 {
     public string Keyword { get; set; }
+    public int TokenCount { get; set; }
 }
 
 public class GenerateKeywordFromRequestCommandHandler : IRequestHandler<GenerateKeywordFromRequestCommand, GenerateKeywordFromRequestResponse>
@@ -28,7 +29,8 @@ public class GenerateKeywordFromRequestCommandHandler : IRequestHandler<Generate
 
         return new GenerateKeywordFromRequestResponse
         {
-            Keyword = keyword
+            Keyword = keyword.Keyword,
+            TokenCount = keyword.TokenCount
         };
     }
 }

@@ -13,7 +13,7 @@ namespace MijnCopilot.Application.Helpers;
 
 public interface ICopilotHelper
 {
-    Task<string> GenerateKeyword(string request);
+    Task<KeywordResult> GenerateKeyword(string request);
     Task<MyChatHistory> Chat(MyChatHistory history);
 }
 
@@ -31,10 +31,11 @@ public class CopilotHelper : ICopilotHelper
         _agentFactory = agentFactory;
     }
 
-    public async Task<string> GenerateKeyword(string request)
+    public async Task<KeywordResult> GenerateKeyword(string request)
     {
         var agent = await _agentFactory.Create(AgentType.Keyword);
-        return await agent.Chat(new ChatHistory(request, AuthorRole.User));
+        var response = await agent.Chat(new ChatHistory(request, AuthorRole.User));
+        return new KeywordResult { Keyword = response.Response, TokenCount = response.InputTokenCount + response.OutputTokenCount };
     }
 
     public async Task<MyChatHistory> Chat(MyChatHistory history)
@@ -55,7 +56,11 @@ public class CopilotHelper : ICopilotHelper
         var photoCarouselAgent = await _agentFactory.Create(AgentType.PhotoCarousel);
 
         // Create the orchestration manager and the orchestration itself.
-        var manager = new MyOrchestrationManager(_agentFactory) { MaximumInvocationCount = 1 };
+        var manager = new MyOrchestrationManager(_agentFactory)
+        {
+            MaximumInvocationCount = 10,
+            OrchestrationCallback = orchestratorCallback
+        };
         var orchestration = new GroupChatOrchestration(manager,
             generalAgent.Agent, mijnThuisPowerAgent.Agent, mijnThuisSolarAgent.Agent,
             mijnThuisCarAgent.Agent, mijnThuisHeatingAgent.Agent, mijnThuisSmartLockAgent.Agent,
@@ -66,13 +71,15 @@ public class CopilotHelper : ICopilotHelper
 
         // Summarize the chat history to provide a clear question for the orchestration.
         var summary = await SummarizeChatHistory(history);
+        _inputTokenCount += summary.InputTokenCount;
+        _outputTokenCount += summary.OutputTokenCount;
 
         // Start an in-process runtime to run the orchestration.
         var runtime = new InProcessRuntime();
         await runtime.StartAsync();
 
         // Invoke the orchestration with the summarized input and retrieve the response.
-        var result = await orchestration.InvokeAsync(summary, runtime);
+        var result = await orchestration.InvokeAsync(summary.Response, runtime);
         var response = await result.GetValueAsync();
 
         // Ensure all asynchronous operations are completed.
@@ -89,7 +96,7 @@ public class CopilotHelper : ICopilotHelper
         return newHistory;
     }
 
-    private async Task<string> SummarizeChatHistory(MyChatHistory history)
+    private async Task<MyAgentResponse> SummarizeChatHistory(MyChatHistory history)
     {
         var summaryAgent = await _agentFactory.Create(AgentType.Summary);
         return await summaryAgent.Chat(history);
@@ -97,7 +104,19 @@ public class CopilotHelper : ICopilotHelper
 
     private async ValueTask responseCallback(Microsoft.SemanticKernel.ChatMessageContent response)
     {
-        _lastAgentName = response.AuthorName ?? string.Empty;
+        var agentName = GetAgentName(response.AuthorName);
+
+        if (!string.IsNullOrEmpty(agentName) && !_lastAgentName.Contains(agentName))
+        {
+            if (string.IsNullOrEmpty(_lastAgentName))
+            {
+                _lastAgentName = agentName ?? string.Empty;
+            }
+            else
+            {
+                _lastAgentName += $", {agentName}";
+            }
+        }
 
         if (response.Metadata != null && response.Metadata.ContainsKey("Usage"))
         {
@@ -109,6 +128,34 @@ public class CopilotHelper : ICopilotHelper
             }
         }
     }
+
+    private void orchestratorCallback(string authorName, int inputTokenCount, int outputTokenCount)
+    {
+        _inputTokenCount += inputTokenCount;
+        _outputTokenCount += outputTokenCount;
+    }
+
+    private static string GetAgentName(string internalName)
+    {
+        return internalName switch
+        {
+            "GeneralAgent" => "General",
+            "MijnThuisPowerAgent" => "MijnThuis - Power",
+            "MijnThuisSolarAgent" => "MijnThuis - Solar",
+            "MijnThuisCarAgent" => "MijnThuis - Car",
+            "MijnThuisHeatingAgent" => "MijnThuis - Heating",
+            "MijnThuisSmartLockAgent" => "MijnThuis - SmartLock",
+            "MijnSaunaAgent" => "MijnSauna",
+            "PhotoCarouselAgent" => "PhotoCarousel",
+            _ => internalName
+        };
+    }
+}
+
+public class KeywordResult
+{
+    public string Keyword { get; set; }
+    public int TokenCount { get; set; }
 }
 
 #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

@@ -5,6 +5,7 @@ using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using ModelContextProtocol.Client;
+using OpenAI.Chat;
 using System.Diagnostics;
 using System.Text;
 
@@ -95,18 +96,43 @@ internal class MyAgent : IAgent
         Agent = agent;
     }
 
-    public async Task<string> Chat(ChatHistory chatHistory)
+    public async Task<MyAgentResponse> Chat(ChatHistory chatHistory)
     {
         var responseBuilder = new StringBuilder();
+        var inputTokenCount = 0;
+        var outputTokenCount = 0;
+
         await foreach (var message in Agent.InvokeAsync(chatHistory))
         {
             responseBuilder.Append(message.Message.Content);
+
+            if (message.Message.Metadata != null && message.Message.Metadata.ContainsKey("Usage"))
+            {
+                var usage = message.Message.Metadata["Usage"] as ChatTokenUsage;
+                if (usage != null)
+                {
+                    inputTokenCount += usage.InputTokenCount;
+                    outputTokenCount += usage.OutputTokenCount;
+                }
+            }
         }
 
         var response = responseBuilder.ToString();
-        Debug.WriteLine($"[{Agent.Name}] {chatHistory.First().Content} -> {response}");
-        return response;
+
+        return new MyAgentResponse
+        {
+            Response = responseBuilder.ToString(),
+            InputTokenCount = inputTokenCount,
+            OutputTokenCount = outputTokenCount
+        };
     }
+}
+
+public class MyAgentResponse
+{
+    public string Response { get; set; } = string.Empty;
+    public int InputTokenCount { get; set; } = 0;
+    public int OutputTokenCount { get; set; } = 0;
 }
 
 #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

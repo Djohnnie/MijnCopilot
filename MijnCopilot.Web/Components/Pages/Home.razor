@@ -28,7 +28,7 @@
             <MudAvatar Color="Color.Primary">
                 <MudIcon Icon="@Icons.Material.Filled.Face" Color="Color.Default" />
             </MudAvatar>
-            <MudChatHeader Name="Jij" Time="nu juist" />
+            <MudChatHeader Name="Jij" Time="Zojuist" />
             <MudChatBubble Color="Color.Default">
                 @_request
             </MudChatBubble>
@@ -82,7 +82,8 @@
         var response = await Mediator.Send(new CreateNewChatCommand
         {
             Title = keyword.Keyword,
-            Request = _request
+            Request = _request,
+			TokensUsed = keyword.TokenCount
         });
 
         NavigationHelper.AddLink(response.ChatId, keyword.Keyword, $"/chat/{response.ChatId}", insert: true);
