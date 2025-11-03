@@ -6,7 +6,6 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using ModelContextProtocol.Client;
 using OpenAI.Chat;
-using System.Diagnostics;
 using System.Text;
 
 namespace MijnCopilot.Application.Helpers;
@@ -16,7 +15,7 @@ namespace MijnCopilot.Application.Helpers;
 internal abstract class AgentFactoryBase
 {
     private readonly IConfiguration _configuration;
-    private IMcpClient _mcpClient;
+    private McpClient _mcpClient;
 
     protected virtual string AgentName => "AGENT_NAME";
     protected virtual string AgentDescription => "AGENT_DESCRIPTION";
@@ -71,8 +70,8 @@ internal abstract class AgentFactoryBase
     {
         var endpoint = _configuration.GetValue<string>(McpEndpointConfig);
 
-        _mcpClient = await McpClientFactory.CreateAsync(
-            new SseClientTransport(new()
+        _mcpClient = await McpClient.CreateAsync(
+            new HttpClientTransport(new()
             {
                 Name = McpName,
                 Endpoint = new Uri(endpoint)
