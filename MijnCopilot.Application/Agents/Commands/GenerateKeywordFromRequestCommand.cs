@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using MijnCopilot.Application.Helpers;
+using MijnCopilot.Agents;
 
 namespace MijnCopilot.Application.Agents.Commands;
 
@@ -11,7 +11,8 @@ public class GenerateKeywordFromRequestCommand : IRequest<GenerateKeywordFromReq
 public class GenerateKeywordFromRequestResponse
 {
     public string Keyword { get; set; }
-    public int TokenCount { get; set; }
+    public int InputTokenCount { get; set; }
+    public int OutputTokenCount { get; set; }
 }
 
 public class GenerateKeywordFromRequestCommandHandler : IRequestHandler<GenerateKeywordFromRequestCommand, GenerateKeywordFromRequestResponse>
@@ -30,7 +31,8 @@ public class GenerateKeywordFromRequestCommandHandler : IRequestHandler<Generate
         return new GenerateKeywordFromRequestResponse
         {
             Keyword = keyword.Keyword,
-            TokenCount = keyword.TokenCount
+            InputTokenCount = keyword.InputTokenCount,
+            OutputTokenCount = keyword.OutputTokenCount
         };
     }
 }

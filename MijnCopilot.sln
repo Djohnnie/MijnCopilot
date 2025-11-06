@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36310.24
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11201.2 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MijnCopilot.Web", "MijnCopilot.Web\MijnCopilot.Web.csproj", "{FE8DFBAC-CE23-D5EB-CA32-7F2D6C0FAD4D}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MijnCopilot.Application", "MijnCopilot.Application\MijnCopilot.Application.csproj", "{B0F6CC25-C1F7-4863-A925-507E95415338}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MijnCopilot.Contracts", "MijnCopilot.Contracts\MijnCopilot.Contracts.csproj", "{56F9D92F-1EAD-40E7-BA52-8862F859E0ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MijnCopilot.Agents", "MijnCopilot.Agents\MijnCopilot.Agents.csproj", "{8F5E42A5-FB2B-4919-9804-CA023EA3F298}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{56F9D92F-1EAD-40E7-BA52-8862F859E0ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56F9D92F-1EAD-40E7-BA52-8862F859E0ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56F9D92F-1EAD-40E7-BA52-8862F859E0ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F5E42A5-FB2B-4919-9804-CA023EA3F298}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F5E42A5-FB2B-4919-9804-CA023EA3F298}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F5E42A5-FB2B-4919-9804-CA023EA3F298}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F5E42A5-FB2B-4919-9804-CA023EA3F298}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

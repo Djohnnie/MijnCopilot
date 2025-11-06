@@ -1,12 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
+using MijnCopilot.Agents.Base;
 
-namespace MijnCopilot.Application.Helpers.Agents;
+namespace MijnCopilot.Agents;
 
-public interface IGeneralAgentFactory : IAgentFactory
-{    
-}
-
-internal class GeneralAgentFactory : AgentFactoryBase, IGeneralAgentFactory
+internal class GeneralAgentFactory : AgentFactoryBase
 {
     private string _description = "An agent that can answer general questions";
     private string _instructions = @"
@@ -16,7 +13,7 @@ Adhere to the following rules:
 - Separate every sentence with a [BR] as custom newline";
 
     protected override string AgentName => "GeneralAgent";
-    protected override string AgentDescription => _description;
+    public override string AgentDescription => _description;
     protected override string AgentInstruction => _instructions;
 
     public GeneralAgentFactory(IConfiguration configuration) : base(configuration) { }

@@ -83,7 +83,7 @@
         {
             Title = keyword.Keyword,
             Request = _request,
-			TokensUsed = keyword.TokenCount
+            TokensUsed = keyword.InputTokenCount + keyword.OutputTokenCount
         });
 
         NavigationHelper.AddLink(response.ChatId, keyword.Keyword, $"/chat/{response.ChatId}", insert: true);

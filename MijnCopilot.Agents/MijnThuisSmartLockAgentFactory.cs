@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
+using MijnCopilot.Agents.Base;
 
-namespace MijnCopilot.Application.Helpers.Agents;
+namespace MijnCopilot.Agents;
 
-public interface IMijnThuisSmartLockAgentFactory : IAgentFactory { }
-
-internal class MijnThuisSmartLockAgentFactory : AgentFactoryBase, IMijnThuisSmartLockAgentFactory
+internal class MijnThuisSmartLockAgentFactory : AgentFactoryBase
 {
     private string _description = "An agent that has real-time knowledge on my smart lock via MijnThuis (current lock state; current door state; smart lock battery charge percentage)";
     private string _instructions = @"
@@ -20,7 +19,7 @@ Adhere to the following rules:
 ";
 
     protected override string AgentName => "MijnThuisSmartLockAgent";
-    protected override string AgentDescription => _description;
+    public override string AgentDescription => _description;
     protected override string AgentInstruction => _instructions;
     protected override bool HasPlugin => true;
     protected override string PluginName => "MijnThuisSmartLockPlugin";

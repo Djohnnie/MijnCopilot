@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
+using MijnCopilot.Agents.Base;
 
-namespace MijnCopilot.Application.Helpers.Agents;
+namespace MijnCopilot.Agents;
 
-public interface IMijnThuisCarAgentFactory : IAgentFactory { }
-
-internal class MijnThuisCarAgentFactory : AgentFactoryBase, IMijnThuisCarAgentFactory
+internal class MijnThuisCarAgentFactory : AgentFactoryBase
 {
     private string _description = "An agent that has real-time knowledge on my electric car via MijnThuis (current car location; car battery charge percentage and health; locking and unlocking car; starting and stopping car charging)";
     private string _instructions = @"
@@ -21,7 +20,7 @@ Adhere to the following rules:
 ";
 
     protected override string AgentName => "MijnThuisCarAgent";
-    protected override string AgentDescription => _description;
+    public override string AgentDescription => _description;
     protected override string AgentInstruction => _instructions;
     protected override bool HasPlugin => true;
     protected override string PluginName => "MijnThuisCarPlugin";

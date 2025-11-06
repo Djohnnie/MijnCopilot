@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MijnCopilot.Application.Helpers.Agents;
-using MijnCopilot.Application.Helpers;
+using MijnCopilot.Agents.DependencyInjection;
 using MijnCopilot.DataAccess.DependencyInjection;
 using System.Reflection;
 
@@ -19,22 +18,7 @@ public static class ServiceCollectionExtensions
             c.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
 
-        services.AddScoped<ICopilotHelper, CopilotHelper>();
-        services.AddScoped<AgentFactory>();
-        services.AddScoped<IKeywordAgentFactory, KeywordAgentFactory>();
-        services.AddScoped<ISummaryAgentFactory, SummaryAgentFactory>();
-        services.AddScoped<IOrchestratorAgentFactory, OrchestratorAgentFactory>();
-        services.AddScoped<IQuestionAgentFactory, QuestionAgentFactory>();
-        services.AddScoped<IReplyAgentFactory, ReplyAgentFactory>();
-        services.AddScoped<IGeneralAgentFactory, GeneralAgentFactory>();
-        services.AddScoped<IMijnThuisPowerAgentFactory, MijnThuisPowerAgentFactory>();
-        services.AddScoped<IMijnThuisSolarAgentFactory, MijnThuisSolarAgentFactory>();
-        services.AddScoped<IMijnThuisCarAgentFactory, MijnThuisCarAgentFactory>();
-        services.AddScoped<IMijnThuisHeatingAgentFactory, MijnThuisHeatingAgentFactory>();
-        services.AddScoped<IMijnThuisSmartLockAgentFactory, MijnThuisSmartLockAgentFactory>();
-        services.AddScoped<IMijnSaunaAgentFactory, MijnSaunaAgentFactory>();
-        services.AddScoped<IPhotoCarouselAgentFactory, PhotoCarouselAgentFactory>();
-
+        services.AddCopilotServices(configuration);
         services.AddDataService();
 
         return services;

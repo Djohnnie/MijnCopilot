@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
+using MijnCopilot.Agents.Base;
 
-namespace MijnCopilot.Application.Helpers.Agents;
+namespace MijnCopilot.Agents;
 
-public interface IMijnThuisHeatingAgentFactory : IAgentFactory { }
-
-internal class MijnThuisHeatingAgentFactory : AgentFactoryBase, IMijnThuisHeatingAgentFactory
+internal class MijnThuisHeatingAgentFactory : AgentFactoryBase
 {
     private string _description = "An agent that has real-time knowledge on my heating installation via MijnThuis (current temperature in my home and outside; current setpoint temperature and next setpoint temperature; next setpoint scheduled time)";
     private string _instructions = @"
@@ -21,7 +20,7 @@ Adhere to the following rules:
 ";
 
     protected override string AgentName => "MijnThuisHeatingAgent";
-    protected override string AgentDescription => _description;
+    public override string AgentDescription => _description;
     protected override string AgentInstruction => _instructions;
     protected override bool HasPlugin => true;
     protected override string PluginName => "MijnThuisHeatingPlugin";

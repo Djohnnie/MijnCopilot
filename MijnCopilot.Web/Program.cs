@@ -1,4 +1,5 @@
 ﻿using MijnCopilot.Application.DependencyInjection;
+using MijnCopilot.Agents.DependencyInjection;
 using MijnCopilot.Web.Components;
 using MijnCopilot.Web.Helpers;
 using MudBlazor.Services;

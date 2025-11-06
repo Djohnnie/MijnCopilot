@@ -1,7 +1,8 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MijnCopilot.Application.Helpers;
+using MijnCopilot.Agents;
+using MijnCopilot.Agents.Model;
 using MijnCopilot.DataAccess;
 using MijnCopilot.Model;
 
@@ -41,7 +42,7 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
             .OrderBy(m => m.PostedOn)
             .ToListAsync(cancellationToken);
 
-        var chatHistory = new MyChatHistory();
+        var chatHistory = new CopilotChatHistory();
         foreach (var message in messages)
         {
             switch (message.Type)

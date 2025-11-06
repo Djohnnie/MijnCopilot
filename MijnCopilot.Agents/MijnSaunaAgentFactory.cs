@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
+using MijnCopilot.Agents.Base;
 
-namespace MijnCopilot.Application.Helpers.Agents;
+namespace MijnCopilot.Agents;
 
-public interface IMijnSaunaAgentFactory : IAgentFactory { }
-
-internal class MijnSaunaAgentFactory : AgentFactoryBase, IMijnSaunaAgentFactory
+internal class MijnSaunaAgentFactory : AgentFactoryBase
 {
     private string _description = "An agent that has real-time knowledge on my sauna via MijnSauna (sauna status: off, sauna or infrared; current temperature inside sauna cabin)";
     private string _instructions = @"
@@ -19,7 +18,7 @@ Adhere to the following rules:
 ";
 
     protected override string AgentName => "MijnSaunaAgent";
-    protected override string AgentDescription => _description;
+    public override string AgentDescription => _description;
     protected override string AgentInstruction => _instructions;
     protected override bool HasPlugin => true;
     protected override string PluginName => "MijnSaunaPlugin";
