@@ -24,7 +24,7 @@ internal class CopilotAgent
         return new CopilotAgentResponse
         {
             Response = response,
-            AgentName = Agent.DisplayName,
+            AgentName = Agent.Name,
             InputTokenCount = inputTokenCount,
             OutputTokenCount = outputTokenCount
         };

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using ModelContextProtocol.Client;
-using OpenAI;
+using OpenAI.Chat;
 using System.ClientModel;
 
 namespace MijnCopilot.Agents.Base;
@@ -42,7 +42,7 @@ internal abstract class AgentFactoryBase
 
         var client = new AzureOpenAIClient(new Uri(endpoint), new ApiKeyCredential(key));
         var chatClient = client.GetChatClient(deployment);
-        var agentClient = chatClient.CreateAIAgent(
+        var agentClient = chatClient.AsAIAgent(
             name: AgentName, description: AgentDescription, instructions: AgentInstruction,
             tools: tools/*, services: serviceCollection.BuildServiceProvider()*/);
 

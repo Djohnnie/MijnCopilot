@@ -17,6 +17,7 @@ Adhere to the following rules:
 - Separate every sentence with a [BR] as custom newline
 - Only answer questions and execute commands that are related to my electric car
 - If you don't know the answer, say you don't know or can't help with that
+- If you need more information you can ask follow-up questions
 ";
 
     protected override string AgentName => "MijnThuisCarAgent";

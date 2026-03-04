@@ -5,10 +5,10 @@ namespace MijnCopilot.Agents;
 
 internal class SummaryAgentFactory : AgentFactoryBase
 {
-    private string _description = "An agent that summarizes questions and commands in chat history";
+    private string _description = "An agent that repeats the final question in chat history with some added context if needed";
     private string _instructions = @"
-You are an internal agent that should repeat the final question in the conversation. 
-If the question is not clear, you can use the whole conversation as context and make the final question more clear.";
+You are an internal agent that should repeat the final question in the conversation literally and optionally enhance it with context from the whole conversation. 
+Always ask the question as if it was asked by the user and never from a 'third person'.";
 
     protected override string AgentName => "SummaryAgent";
     public override string AgentDescription => _description;
