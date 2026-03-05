@@ -5,6 +5,7 @@ namespace MijnCopilot.Agents.Model;
 public class CopilotChatHistory
 {
     public List<CopilotChat> Messages { get; private set; } = new List<CopilotChat>();
+    public List<DebugChat> Debug { get; private set; } = new List<DebugChat>();
     public string LastAssistantMessage { get; set; }
     public string AgentName { get; set; }
     public int InputTokenCount { get; set; }
@@ -81,6 +82,15 @@ public class CopilotChatHistory
         Messages.Add(new CopilotChat
         {
             Role = CopilotChatRole.Assistant,
+            Content = message
+        });
+    }
+
+    public void AddDebug(string message, string agentName)
+    {
+        Debug.Add(new DebugChat
+        {
+            AgentName = agentName,
             Content = message
         });
     }

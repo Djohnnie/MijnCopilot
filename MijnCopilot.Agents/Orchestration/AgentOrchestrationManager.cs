@@ -67,11 +67,14 @@ internal class AgentOrchestrationManager : IAgentOrchestrationManager
     {
         var workingChat = chat.Copy();
 
+        // 1. Summarize the conversation so far to focus on the question asked by the user.
         var summaryAgent = await _summaryAgentFactory.Create();
         var summaryResponse = await summaryAgent.Chat(workingChat);
         workingChat.InputTokenCount += summaryResponse.InputTokenCount;
         workingChat.OutputTokenCount += summaryResponse.OutputTokenCount;
+        workingChat.AddDebug(summaryResponse.Response, summaryAgent.Agent.Name);
 
+        // 2. 
         var agents = string.Join(",", _agents.Select(x => $"Name: {x.Key}; Description: {x.Value.AgentDescription}"));
         var systemPromptBuilder = new StringBuilder();
         systemPromptBuilder.AppendLine("Based on the conversation so far, which agents are best suited to respond to the questions asked?");
@@ -81,6 +84,7 @@ internal class AgentOrchestrationManager : IAgentOrchestrationManager
         systemPromptBuilder.AppendLine("Respond with a line for each question, including the rewritten question followed by a semicolon, followed by the name of the agent that should answer that question.");
         workingChat.AddSystemMessage(systemPromptBuilder.ToString());
 
+        // 3. Orchestrate the conversation and 
         var orchestratorAgent = await _orchestratorAgentFactory.Create();
         var orchestratorResponse = await orchestratorAgent.Chat(workingChat);
         workingChat.InputTokenCount += orchestratorResponse.InputTokenCount;
@@ -93,21 +97,24 @@ internal class AgentOrchestrationManager : IAgentOrchestrationManager
             var agentFactory = _agents[parts[1].Trim()];
             var agent = await agentFactory.Create();
             agentTasks.Add(agent.Chat(new CopilotChatHistory(parts[0], CopilotChatRole.User)));
+            workingChat.AddDebug(parts[0], agent.Agent.Name);
         }
 
         var responses = await Task.WhenAll(agentTasks);
 
         var replyAgent = await _replyAgentFactory.Create();
-        var replayAgentChat = new CopilotChatHistory();
-        replayAgentChat.AddUserMessage(summaryResponse.Response);
+        var replyAgentChat = new CopilotChatHistory();
+        replyAgentChat.AddUserMessage(summaryResponse.Response);
         foreach (var response in responses)
         {
-            replayAgentChat.AddAssistantMessage(response.Response);
+            replyAgentChat.AddAssistantMessage(response.Response);
             workingChat.InputTokenCount += response.InputTokenCount;
             workingChat.OutputTokenCount += response.OutputTokenCount;
+            workingChat.AddDebug(response.Response, response.AgentName);
         }
 
-        var replyResponse = await replyAgent.Chat(replayAgentChat);
+        var replyResponse = await replyAgent.Chat(replyAgentChat);
+        workingChat.AddDebug(replyResponse.Response, replyAgent.Agent.Name);
 
         workingChat.AddAssistantMessage(replyResponse.Response);
         workingChat.LastAssistantMessage = replyResponse.Response;

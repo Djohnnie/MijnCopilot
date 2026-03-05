@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MijnCopilot.DataAccess;
+using MijnCopilot.Model;
 
 namespace MijnCopilot.Application.Chats.Queries;
 
@@ -32,7 +33,8 @@ public enum ChatRole
 {
     User,
     Assistant,
-    Reduced
+    Reduced,
+    Debug
 }
 
 public class GetChatQueryHandler : IRequestHandler<GetChatQuery, GetChatResponse>
@@ -67,7 +69,7 @@ public class GetChatQueryHandler : IRequestHandler<GetChatQuery, GetChatResponse
             {
                 Content = m.Content,
                 AgentName = m.AgentName,
-                Role = m.Type == Model.MessageType.Assistant ? ChatRole.Assistant : ChatRole.User,
+                Role = MapChatRole(m.Type),
                 PostedOn = m.PostedOn,
                 TokensUsed = m.TokensUsed,
             })
@@ -79,6 +81,18 @@ public class GetChatQueryHandler : IRequestHandler<GetChatQuery, GetChatResponse
             Title = chat?.Title ?? string.Empty,
             StartedOn = chat?.StartedOn ?? DateTime.MinValue,
             Messages = messages
+        };
+    }
+
+    private static ChatRole MapChatRole(MessageType messageType)
+    {
+        return messageType switch
+        {
+            MessageType.Assistant => ChatRole.Assistant,
+            MessageType.User => ChatRole.User,
+            MessageType.Reduced => ChatRole.Reduced,
+            MessageType.Debug => ChatRole.Debug,
+            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
         };
     }
 }

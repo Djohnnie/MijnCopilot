@@ -95,6 +95,20 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
+        foreach (var debugMessage in copilotResponse.Debug)
+        {
+            dbContext.Messages.Add(new Message
+            {
+                Id = Guid.NewGuid(),
+                Chat = chat,
+                Content = debugMessage.Content,
+                AgentName = debugMessage.AgentName,
+                PostedOn = DateTime.UtcNow,
+                TokensUsed = 0,
+                Type = MessageType.Debug
+            });
+        }
+
         dbContext.Messages.Add(new Message
         {
             Id = Guid.NewGuid(),

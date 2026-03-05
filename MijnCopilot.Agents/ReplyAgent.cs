@@ -11,7 +11,7 @@ You should summarize a reply from a chat history and combine multiple replies in
 If there are follow-up questions, you should direct them to the user and ask them directly for an answer.
 ";
 
-    protected override string AgentName => "QuestionAgent";
+    protected override string AgentName => "ReplyAgent";
     public override string AgentDescription => _description;
     protected override string AgentInstruction => _instructions;
 
