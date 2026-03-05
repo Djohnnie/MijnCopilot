@@ -34,7 +34,8 @@ public enum ChatRole
     User,
     Assistant,
     Reduced,
-    Debug
+    DebugQuestion,
+    DebugAnswer
 }
 
 public class GetChatQueryHandler : IRequestHandler<GetChatQuery, GetChatResponse>
@@ -91,7 +92,8 @@ public class GetChatQueryHandler : IRequestHandler<GetChatQuery, GetChatResponse
             MessageType.Assistant => ChatRole.Assistant,
             MessageType.User => ChatRole.User,
             MessageType.Reduced => ChatRole.Reduced,
-            MessageType.Debug => ChatRole.Debug,
+            MessageType.DebugQuestion => ChatRole.DebugQuestion,
+            MessageType.DebugAnswer => ChatRole.DebugAnswer,
             _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
         };
     }

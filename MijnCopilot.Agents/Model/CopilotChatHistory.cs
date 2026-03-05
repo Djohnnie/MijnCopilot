@@ -86,10 +86,11 @@ public class CopilotChatHistory
         });
     }
 
-    public void AddDebug(string message, string agentName)
+    public void AddDebug(bool isQuestion, string message, string agentName)
     {
         Debug.Add(new DebugChat
         {
+            IsQuestion = isQuestion,
             AgentName = agentName,
             Content = message
         });

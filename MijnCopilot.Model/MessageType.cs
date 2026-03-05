@@ -6,5 +6,6 @@ public enum MessageType
     Assistant = 1,
     System = 2,
     Reduced = 3,
-    Debug = 4
+    DebugQuestion = 4,
+    DebugAnswer = 5
 }

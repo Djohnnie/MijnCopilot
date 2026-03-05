@@ -105,7 +105,7 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
                 AgentName = debugMessage.AgentName,
                 PostedOn = DateTime.UtcNow,
                 TokensUsed = 0,
-                Type = MessageType.Debug
+                Type = debugMessage.IsQuestion ? MessageType.DebugQuestion : MessageType.DebugAnswer
             });
         }
 

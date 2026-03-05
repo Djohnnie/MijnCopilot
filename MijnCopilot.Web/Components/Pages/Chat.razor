@@ -29,7 +29,7 @@
 
     @foreach (var message in Messages)
     {
-        if (!string.IsNullOrWhiteSpace(message.Content) && message.Role != ChatRole.Reduced && message.Role != ChatRole.Debug)
+        if (!string.IsNullOrWhiteSpace(message.Content) && message.Role != ChatRole.Reduced && message.Role != ChatRole.DebugQuestion && message.Role != ChatRole.DebugAnswer)
         {
             <MudChat ChatPosition="@(message.Role == ChatRole.Assistant ? ChatBubblePosition.Start : ChatBubblePosition.End)">
                 <MudAvatar Color="Color.Default">
@@ -63,9 +63,9 @@
             </MudChat>
         }
 
-        if (!string.IsNullOrWhiteSpace(message.Content) && message.Role == ChatRole.Debug)
+        if (_debugMode && !string.IsNullOrWhiteSpace(message.Content) && (message.Role == ChatRole.DebugQuestion || message.Role == ChatRole.DebugAnswer))
         {
-            <MudChat ChatPosition="ChatBubblePosition.Start" Color="Color.Secondary">
+            <MudChat ChatPosition="@(message.Role == ChatRole.DebugQuestion ? ChatBubblePosition.Start : ChatBubblePosition.End)" Color="Color.Secondary">
                 <MudAvatar Color="Color.Secondary">
                     <MudIcon Icon="@Icons.Material.Filled.BugReport" Color="Color.Default" />
                 </MudAvatar>
